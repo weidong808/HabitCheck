@@ -2,7 +2,8 @@
 
 **Recover after missed days** — local-first weekly habit coach (AI in Action #4).
 
-- Live (planned): https://habitcheck.weidong-shi.com
+- Live: https://habitcheck-nine.vercel.app
+- Custom domain (DNS pending): https://habitcheck.weidong-shi.com
 - Hub: https://weidong-shi.com
 - Roadmap / MVP: https://github.com/weidong808/ai-in-action-roadmap/blob/main/docs/discovery/habitcheck-02-mvp-specification.md
 
