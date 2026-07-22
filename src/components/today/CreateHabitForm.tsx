@@ -123,13 +123,16 @@ export function CreateHabitForm({
         </p>
       </div>
 
-      <div className="rounded-xl border border-[var(--border)] bg-[var(--background)]/60 p-4">
+      <div className="rounded-xl border border-[var(--accent)]/20 bg-[color-mix(in_srgb,var(--accent)_5%,var(--background))] p-4">
         <p className="font-mono text-[10px] tracking-[0.14em] text-[var(--accent)] uppercase">
           Coach · Habit Starter
         </p>
+        <p className="mt-1 text-xs leading-relaxed text-[var(--muted)]">
+          One-shot suggestion — not a chat. You edit and accept everything.
+        </p>
         {aiEnabled ? (
           <>
-            <label className="mt-2 block text-sm">
+            <label className="mt-3 block text-sm">
               <span className="font-medium text-[var(--foreground)]">
                 Describe your goal
               </span>
@@ -148,10 +151,10 @@ export function CreateHabitForm({
                 disabled || saving || coachBusy || goalText.trim().length < 3
               }
               onClick={() => setConsent("starter")}
-              className="mt-3 inline-flex min-h-10 items-center rounded-lg border border-[var(--border)] px-3 text-sm font-medium disabled:opacity-50"
+              className="mt-3 inline-flex min-h-10 items-center rounded-lg bg-[var(--accent)] px-3 text-sm font-medium text-[var(--accent-foreground)] disabled:opacity-50"
             >
               {coachBusy && consent === "starter"
-                ? "Coaching…"
+                ? "Listening…"
                 : "Ask Habit Starter"}
             </button>
           </>

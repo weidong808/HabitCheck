@@ -25,6 +25,7 @@ export function CoachReviewCards({
   const [error, setError] = useState<string | null>(null);
   const [cards, setCards] = useState<CoachCard[] | null>(null);
   const [nextWeekMove, setNextWeekMove] = useState<string | null>(null);
+  const [revealKey, setRevealKey] = useState(0);
 
   const eligible = reviews.filter((r) => r.closedWeeks.length > 0).slice(0, 3);
 
@@ -32,6 +33,8 @@ export function CoachReviewCards({
     if (eligible.length === 0) return;
     setBusy(true);
     setError(null);
+    setCards(null);
+    setNextWeekMove(null);
     const result = await callCoach<{
       cards: CoachCard[];
       nextWeekMove: string;
@@ -67,6 +70,7 @@ export function CoachReviewCards({
       setError(result.error);
       return;
     }
+    setRevealKey((k) => k + 1);
     setCards(result.data.cards);
     setNextWeekMove(result.data.nextWeekMove);
   }
@@ -88,27 +92,53 @@ export function CoachReviewCards({
   }
 
   return (
-    <section className="mt-8 rounded-2xl border border-[var(--border)] bg-[var(--card)] p-5 shadow-[0_1px_0_color-mix(in_srgb,var(--foreground)_4%,transparent)]">
-      <p className="font-mono text-[10px] tracking-[0.14em] text-[var(--accent)] uppercase">
-        Coach · Weekly review
-      </p>
-      <h2
-        className="mt-1 text-xl text-[var(--foreground)]"
-        style={{ fontFamily: "var(--font-display)" }}
-      >
-        Insight cards
-      </h2>
-      <p className="mt-1 text-sm leading-relaxed text-[var(--muted)]">
-        Optional coaching on closed-week summaries — Facts stay local until you
-        consent.
+    <section className="hc-coach-panel mt-8 overflow-hidden rounded-2xl border border-[var(--accent)]/20 bg-[color-mix(in_srgb,var(--accent)_5%,var(--card))] p-5 sm:p-6">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="font-mono text-[10px] tracking-[0.14em] text-[var(--accent)] uppercase">
+            Coach · Weekly review
+          </p>
+          <h2
+            className="mt-1 text-xl text-[var(--foreground)]"
+            style={{ fontFamily: "var(--font-display)" }}
+          >
+            Insight cards
+          </h2>
+        </div>
+        <span
+          className={`hc-coach-pulse mt-1 h-2 w-2 shrink-0 rounded-full bg-[var(--accent)] ${busy ? "is-active" : ""}`}
+          aria-hidden
+        />
+      </div>
+      <p className="mt-2 max-w-lg text-sm leading-relaxed text-[var(--muted)]">
+        A calm read on closed-week patterns — not a chat. Facts stay local until
+        you consent; numbers never get rewritten.
       </p>
 
-      {cards ? (
-        <div className="mt-4 space-y-3">
-          {cards.map((card) => (
+      {busy ? (
+        <div className="hc-coach-listening mt-5 space-y-3" aria-live="polite">
+          <p className="text-sm text-[var(--foreground)]">Listening to your Facts…</p>
+          <div className="space-y-2">
+            <div className="hc-coach-skeleton h-16 rounded-xl" />
+            <div
+              className="hc-coach-skeleton h-16 rounded-xl"
+              style={{ animationDelay: "120ms" }}
+            />
+            <div
+              className="hc-coach-skeleton h-10 rounded-xl"
+              style={{ animationDelay: "240ms" }}
+            />
+          </div>
+        </div>
+      ) : null}
+
+      {!busy && cards ? (
+        <div key={revealKey} className="mt-5 space-y-3">
+          {cards.map((card, index) => (
             <article
               key={`${card.theme}-${card.title}`}
-              className="rounded-xl bg-[var(--background)]/80 p-4"
+              className="hc-coach-stagger rounded-xl border border-[var(--border)]/70 bg-[var(--card)]/90 p-4"
+              style={{ animationDelay: `${120 + index * 180}ms` }}
             >
               <p className="font-mono text-[10px] tracking-[0.14em] text-[var(--muted)] uppercase">
                 {card.theme}
@@ -122,7 +152,10 @@ export function CoachReviewCards({
             </article>
           ))}
           {nextWeekMove ? (
-            <p className="text-sm leading-relaxed text-[var(--foreground)]">
+            <p
+              className="hc-coach-stagger text-sm leading-relaxed text-[var(--foreground)]"
+              style={{ animationDelay: `${120 + cards.length * 180}ms` }}
+            >
               <span className="font-medium">Next week move: </span>
               {nextWeekMove}
             </p>
@@ -136,16 +169,18 @@ export function CoachReviewCards({
             Refresh coach cards
           </button>
         </div>
-      ) : (
+      ) : null}
+
+      {!busy && !cards ? (
         <button
           type="button"
           disabled={busy}
           onClick={() => setConsent(true)}
-          className="hc-interactive mt-4 inline-flex min-h-10 items-center rounded-lg border border-[var(--border)] px-3 text-sm font-medium disabled:opacity-50"
+          className="hc-interactive mt-5 inline-flex min-h-11 items-center rounded-lg bg-[var(--accent)] px-4 text-sm font-medium text-[var(--accent-foreground)] disabled:opacity-50"
         >
-          {busy ? "Coaching…" : "Ask for coach cards"}
+          Ask for coach cards
         </button>
-      )}
+      ) : null}
 
       {error ? (
         <p className="mt-3 text-sm text-red-600 dark:text-red-400" role="alert">

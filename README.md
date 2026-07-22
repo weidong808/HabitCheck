@@ -14,6 +14,8 @@
 **Live:** https://habitcheck.weidong-shi.com · fallback https://habitcheck-nine.vercel.app · Vercel project `wshi/habitcheck`  
 **Still owner-side for public v1.0:** hub case study / LinkedIn.
 
+First visit with no habits opens a branded entry surface (promise + one CTA into Habit Starter / create). Top nav includes a subtle hub link to weidong-shi.com.
+
 Local AI: copy `.env.example` → `.env` (same `OPENAI_API_KEY` pattern as Readiness). Deploy notes: [`docs/architecture/deploy.md`](docs/architecture/deploy.md).  
 Note: `habitcheck.vercel.app` is a different (unrelated) project — use the custom domain or `-nine` / `-wshi` aliases.
 

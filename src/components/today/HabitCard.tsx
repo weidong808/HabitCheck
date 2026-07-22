@@ -65,6 +65,12 @@ export function HabitCard({
   const [showBackfill, setShowBackfill] = useState(false);
   const [backfillDate, setBackfillDate] = useState(today);
   const [error, setError] = useState<string | null>(null);
+  const [pulse, setPulse] = useState<"done" | "skip" | null>(null);
+
+  function flash(kind: "done" | "skip") {
+    setPulse(kind);
+    window.setTimeout(() => setPulse(null), 680);
+  }
 
   const paused = habit.status === "paused";
   const todayDone = hasTargetCountingDone(checkIns, habit.id, today);
@@ -95,7 +101,15 @@ export function HabitCard({
   }
 
   return (
-    <article className="hc-interactive rounded-2xl border border-[var(--border)] bg-[var(--card)] p-5 shadow-[0_1px_0_color-mix(in_srgb,var(--foreground)_4%,transparent)]">
+    <article
+      className={`hc-interactive rounded-2xl border border-[var(--border)] bg-[var(--card)] p-5 shadow-[0_1px_0_color-mix(in_srgb,var(--foreground)_4%,transparent)] ${
+        pulse === "done"
+          ? "hc-check-done"
+          : pulse === "skip"
+            ? "hc-check-skip"
+            : ""
+      }`}
+    >
       <div className="flex items-start gap-4">
         <WeekRing
           done={week.doneCount}
@@ -165,11 +179,13 @@ export function HabitCard({
         <div className="mt-5">
           <p className="text-sm font-medium text-[var(--foreground)]">Today</p>
           {todayDone ? (
-            <p className="mt-2 text-sm text-[var(--accent)]">
+            <p className="hc-status-settle mt-2 text-sm text-[var(--accent)]">
               Done for today. Nice work.
             </p>
           ) : todaySkip ? (
-            <p className="mt-2 text-sm text-[var(--muted)]">Skipped today.</p>
+            <p className="hc-status-settle mt-2 text-sm text-[var(--muted)]">
+              Skipped today.
+            </p>
           ) : (
             <div className="mt-3 space-y-3">
               <fieldset>
@@ -198,7 +214,12 @@ export function HabitCard({
                 <button
                   type="button"
                   disabled={busy}
-                  onClick={() => run(() => onDone(difficulty))}
+                  onClick={() =>
+                    run(async () => {
+                      flash("done");
+                      await onDone(difficulty);
+                    })
+                  }
                   className="inline-flex min-h-11 items-center rounded-lg bg-[var(--accent)] px-4 text-sm font-medium text-[var(--accent-foreground)] disabled:opacity-50"
                 >
                   Mark done
@@ -206,7 +227,12 @@ export function HabitCard({
                 <button
                   type="button"
                   disabled={busy}
-                  onClick={() => run(() => onSkip())}
+                  onClick={() =>
+                    run(async () => {
+                      flash("skip");
+                      await onSkip();
+                    })
+                  }
                   className="inline-flex min-h-11 items-center rounded-lg border border-[var(--border)] px-4 text-sm font-medium text-[var(--foreground)] disabled:opacity-50"
                 >
                   Skip

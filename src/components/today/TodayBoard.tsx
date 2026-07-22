@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { CreateHabitForm } from "@/components/today/CreateHabitForm";
 import { HabitCard } from "@/components/today/HabitCard";
+import { HabitEntrySurface } from "@/components/today/HabitEntrySurface";
 import {
   RecoverySheet,
   type RecoveryChoice,
@@ -152,6 +153,7 @@ export function TodayBoard() {
   }, [habits, checkIns, today]);
 
   const canAdd = canCreateHabit(habits);
+  const isEmpty = views.length === 0;
 
   async function withBusy(action: () => Promise<void>) {
     setBusy(true);
@@ -223,6 +225,20 @@ export function TodayBoard() {
     );
   }
 
+  if (isEmpty && !showCreate) {
+    return (
+      <main id="main" className="mx-auto max-w-3xl px-5 sm:px-6">
+        {loadError ? (
+          <p className="mt-6 text-sm text-red-600 dark:text-red-400" role="alert">
+            {loadError}
+          </p>
+        ) : null}
+        <HabitEntrySurface onStart={() => setShowCreate(true)} />
+        <p className="pb-10 text-sm text-[var(--muted)]">{WELLNESS_DISCLAIMER}</p>
+      </main>
+    );
+  }
+
   return (
     <main id="main" className="mx-auto max-w-3xl px-5 py-10 sm:px-6 sm:py-14">
       <header className="hc-rise">
@@ -288,28 +304,6 @@ export function TodayBoard() {
             onCreate={handleCreate}
             onCancel={() => setShowCreate(false)}
           />
-        ) : null}
-
-        {views.length === 0 && !showCreate ? (
-          <div className="rounded-2xl border border-dashed border-[var(--accent)]/30 bg-[color-mix(in_srgb,var(--accent)_6%,var(--card))] px-6 py-8">
-            <p
-              className="text-xl text-[var(--foreground)]"
-              style={{ fontFamily: "var(--font-display)" }}
-            >
-              Start with one habit
-            </p>
-            <p className="mt-2 max-w-md text-sm leading-relaxed text-[var(--muted)]">
-              Pick a weekly target you can keep. Missed days get a recovery path
-              — no shame, no inflated streaks.
-            </p>
-            <button
-              type="button"
-              onClick={() => setShowCreate(true)}
-              className="mt-5 inline-flex min-h-11 items-center rounded-lg bg-[var(--accent)] px-4 text-sm font-medium text-[var(--accent-foreground)]"
-            >
-              Create your first habit
-            </button>
-          </div>
         ) : null}
 
         {views.map(({ habit, week, priorWeek }) => {

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { RecoveryEvent } from "@/lib/tracking/types";
 
 type OpenRecoveryCardProps = {
@@ -17,11 +18,16 @@ export function OpenRecoveryCard({
   onCompleteMicro,
   onDismiss,
 }: OpenRecoveryCardProps) {
+  const [celebrating, setCelebrating] = useState(false);
   const isMicro =
     event.kind === "smaller_version" || event.kind === "ai_comeback";
 
   return (
-    <div className="mt-4 rounded-xl border border-[var(--accent)]/30 bg-[color-mix(in_srgb,var(--accent)_8%,var(--card))] p-3.5">
+    <div
+      className={`mt-4 rounded-xl border border-[var(--accent)]/30 bg-[color-mix(in_srgb,var(--accent)_8%,var(--card))] p-3.5 ${
+        celebrating ? "hc-recovery-complete" : ""
+      }`}
+    >
       <p className="font-mono text-[10px] tracking-[0.14em] text-[var(--accent)] uppercase">
         Open recovery
       </p>
@@ -35,7 +41,11 @@ export function OpenRecoveryCard({
           <button
             type="button"
             disabled={busy}
-            onClick={() => onCompleteMicro()}
+            onClick={async () => {
+              setCelebrating(true);
+              await new Promise((r) => window.setTimeout(r, 420));
+              await onCompleteMicro();
+            }}
             className="inline-flex min-h-10 items-center rounded-lg bg-[var(--accent)] px-3 text-sm font-medium text-[var(--accent-foreground)] disabled:opacity-50"
           >
             I did it today ({today})

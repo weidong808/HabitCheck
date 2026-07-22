@@ -23,6 +23,8 @@ export const GITHUB_REPO_URL = "https://github.com/weidong808/HabitCheck";
 export const ROADMAP_URL =
   "https://github.com/weidong808/ai-in-action-roadmap";
 
+export const WS_MARK_SRC = "/ws-mark.svg";
+
 export const RETIRECHECK_URL = "https://retirecheck.weidong-shi.com";
 export const SLEEPCHECK_URL = "https://sleepcheck.weidong-shi.com";
 export const READINESS_URL = "https://readiness.weidong-shi.com";

@@ -74,7 +74,11 @@ export function AppFooter() {
               </p>
               <ul className="mt-3 space-y-2">
                 <li>
-                  <SiteHomeLink className="hover:text-[var(--foreground)]" />
+                  <SiteHomeLink
+                    variant="full"
+                    markSize={22}
+                    className="text-[var(--muted)]"
+                  />
                 </li>
                 <li>
                   <a

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { SiteHomeLink } from "@/components/SiteHomeLink";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { APP_NAME, APP_TAGLINE, SITE_SERIES_NAME } from "@/lib/brand";
 
@@ -65,6 +66,11 @@ export function AppHeader() {
               </Link>
             );
           })}
+          <SiteHomeLink
+            variant="compact"
+            markSize={18}
+            className="ml-0.5 hidden text-[var(--muted)] sm:inline-flex"
+          />
           <ThemeToggle />
         </nav>
       </div>
