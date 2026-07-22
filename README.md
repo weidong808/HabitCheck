@@ -2,8 +2,8 @@
 
 **Recover after missed days** — local-first weekly habit coach (AI in Action #4).
 
-- Live: https://habitcheck-nine.vercel.app
-- Custom domain (DNS pending): https://habitcheck.weidong-shi.com
+- Live: https://habitcheck.weidong-shi.com
+- Vercel fallback: https://habitcheck-nine.vercel.app
 - Hub: https://weidong-shi.com
 - Roadmap / MVP: https://github.com/weidong808/ai-in-action-roadmap/blob/main/docs/discovery/habitcheck-02-mvp-specification.md
 
@@ -11,11 +11,11 @@
 
 **P0–P7 code complete** on `main` — Facts tracking, recovery/pause, weekly review ±1, privacy-gated AI coach (Starter · Comeback · Review cards · Plan Adjuster · smaller-version), Settings export/import, PWA manifest. CI green.
 
-**Live:** https://habitcheck-nine.vercel.app · Vercel project `wshi/habitcheck`  
-**Still owner-side for public v1.0:** DNS for `habitcheck.weidong-shi.com` (A → `76.76.21.21`, DNS only), hub case study / LinkedIn.
+**Live:** https://habitcheck.weidong-shi.com · fallback https://habitcheck-nine.vercel.app · Vercel project `wshi/habitcheck`  
+**Still owner-side for public v1.0:** hub case study / LinkedIn.
 
 Local AI: copy `.env.example` → `.env` (same `OPENAI_API_KEY` pattern as Readiness). Deploy notes: [`docs/architecture/deploy.md`](docs/architecture/deploy.md).  
-Note: `habitcheck.vercel.app` is a different (unrelated) project — use the `-nine` / `-wshi` aliases or the custom domain.
+Note: `habitcheck.vercel.app` is a different (unrelated) project — use the custom domain or `-nine` / `-wshi` aliases.
 
 ## Stack
 
@@ -44,7 +44,7 @@ npm run build
 | P3 | Recovery & pause ✓ |
 | P4 | Review Facts + ±1 targets ✓ |
 | P5–P6 | AI platform + coach features ✓ |
-| P7 | Polish & ship ✓ · Vercel live · custom domain pending |
+| P7 | Polish & ship ✓ · Vercel live · custom domain live |
 
 ## License
 

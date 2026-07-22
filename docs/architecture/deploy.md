@@ -1,46 +1,25 @@
 # Deploy notes
 
 **Status:** Live  
-**Production:** https://habitcheck-nine.vercel.app  
+**Production (custom domain):** https://habitcheck.weidong-shi.com  
+**Vercel fallback:** https://habitcheck-nine.vercel.app  
 **Team alias:** https://habitcheck-wshi.vercel.app  
-**Custom domain (added in Vercel; Cloudflare DNS not created yet):** https://habitcheck.weidong-shi.com  
 **GitHub:** https://github.com/weidong808/HabitCheck  
 **Vercel project:** `wshi/habitcheck`  
 
-> `habitcheck.vercel.app` is **not** this project (name taken by another Habit Tracker). Prefer `habitcheck-nine.vercel.app` or the custom domain once DNS is set.
+> `habitcheck.vercel.app` is **not** this project (name taken by another Habit Tracker). Prefer the custom domain or `habitcheck-nine.vercel.app`.
 
-## Cloudflare DNS (owner action required)
+## Cloudflare DNS
 
-Domain is already on the Vercel project. Cloudflare has **no** `habitcheck` record yet (`NXDOMAIN`). Nameservers stay on Cloudflare (`kirk` / `tani`).
+Domain is on the Vercel project. Nameservers stay on Cloudflare (`kirk` / `tani`).
 
-Create **DNS only** (grey cloud / proxy off), same pattern as Readiness/SleepCheck:
+**Record (verified 2026-07-22):** DNS only (grey cloud / proxy off):
 
 | Type | Name | Content | Proxy |
 |------|------|---------|-------|
 | A | `habitcheck` | `76.76.21.21` | DNS only |
 
-### Dashboard steps
-
-1. Cloudflare → zone **weidong-shi.com** → **DNS** → **Records** → **Add record**
-2. Type **A**, Name **`habitcheck`**, IPv4 **`76.76.21.21`**, Proxy status **DNS only** (grey cloud)
-3. Save. Do not enable the orange cloud.
-
-### Optional API (if `CLOUDFLARE_API_TOKEN` + zone id available)
-
-```powershell
-# Token needs Zone.DNS Edit on weidong-shi.com. Never commit the token.
-$zoneId = "<zone-id>"
-$headers = @{ Authorization = "Bearer $env:CLOUDFLARE_API_TOKEN" }
-$body = @{
-  type    = "A"
-  name    = "habitcheck"
-  content = "76.76.21.21"
-  ttl     = 1
-  proxied = $false
-} | ConvertTo-Json
-Invoke-RestMethod -Method Post -Uri "https://api.cloudflare.com/client/v4/zones/$zoneId/dns_records" `
-  -Headers $headers -ContentType "application/json" -Body $body
-```
+Do not enable the orange cloud (keeps Vercel SSL simple).
 
 ### Verify
 
@@ -93,7 +72,7 @@ GitHub is connected — pushes to `main` can trigger production deploys when ena
 ## Post-deploy AI probe
 
 ```powershell
-Invoke-RestMethod https://habitcheck-nine.vercel.app/api/ai
+Invoke-RestMethod https://habitcheck.weidong-shi.com/api/ai
 # expect: status "ready"
 
 $payload = @{
@@ -105,7 +84,7 @@ $payload = @{
 } | ConvertTo-Json
 
 $res = Invoke-RestMethod `
-  -Uri "https://habitcheck-nine.vercel.app/api/ai" `
+  -Uri "https://habitcheck.weidong-shi.com/api/ai" `
   -Method POST -ContentType "application/json" -Body $payload
 $res.ok   # expect: True
 ```
