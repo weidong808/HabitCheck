@@ -8,6 +8,7 @@ import { APP_NAME, APP_TAGLINE, SITE_SERIES_NAME } from "@/lib/brand";
 const NAV: { href: string; label: string; exact?: boolean }[] = [
   { href: "/", label: "Today", exact: true },
   { href: "/review", label: "Review" },
+  { href: "/settings", label: "Settings" },
   { href: "/privacy", label: "Privacy" },
 ];
 

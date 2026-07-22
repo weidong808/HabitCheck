@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { CoachReviewCards } from "@/components/review/CoachReviewCards";
 import { TargetAdjustPrompt } from "@/components/review/TargetAdjustPrompt";
 import { APP_NAME, APP_SERIES_LABEL } from "@/lib/brand";
 import { listCheckIns } from "@/lib/storage/checkInsRepo";
@@ -13,6 +14,7 @@ import {
 } from "@/lib/storage/habitsRepo";
 import { localToday } from "@/lib/storage/ids";
 import { listRecoveryEvents } from "@/lib/storage/recoveryRepo";
+import { getOrCreateSettings } from "@/lib/storage/settingsRepo";
 import {
   buildHabitReviewFacts,
   endOfWeekSunday,
@@ -26,6 +28,7 @@ export function ReviewBoard() {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [checkIns, setCheckIns] = useState<CheckIn[]>([]);
   const [recoveries, setRecoveries] = useState<RecoveryEvent[]>([]);
+  const [aiEnabled, setAiEnabled] = useState(true);
   const [selectedWeekByHabit, setSelectedWeekByHabit] = useState<
     Record<string, string>
   >({});
@@ -36,14 +39,17 @@ export function ReviewBoard() {
     const asOf = localToday();
     setToday(asOf);
     await applyDuePendingTargets(asOf);
-    const [nextHabits, nextCheckIns, nextRecoveries] = await Promise.all([
-      listActiveOrPausedHabits(),
-      listCheckIns(),
-      listRecoveryEvents(),
-    ]);
+    const [nextHabits, nextCheckIns, nextRecoveries, settings] =
+      await Promise.all([
+        listActiveOrPausedHabits(),
+        listCheckIns(),
+        listRecoveryEvents(),
+        getOrCreateSettings(),
+      ]);
     setHabits(nextHabits);
     setCheckIns(nextCheckIns);
     setRecoveries(nextRecoveries);
+    setAiEnabled(settings.aiEnabled);
   }, []);
 
   useEffect(() => {
@@ -112,8 +118,8 @@ export function ReviewBoard() {
         Weekly review
       </h1>
       <p className="mt-3 text-base text-[var(--muted)]">
-        Facts only for now — consistency, recoveries, and difficulty stay
-        separate. Coach insight cards ship with AI phases.
+        Consistency, recoveries, and difficulty stay separate Facts. Optional
+        Coach cards explain patterns without changing the numbers.
       </p>
       <p className="mt-2 font-mono text-[11px] tracking-[0.12em] text-[var(--muted)] uppercase">
         As of · {today}
@@ -124,6 +130,8 @@ export function ReviewBoard() {
           {error}
         </p>
       ) : null}
+
+      <CoachReviewCards reviews={reviews} aiEnabled={aiEnabled} />
 
       {reviews.length === 0 ? (
         <p className="mt-10 text-[var(--muted)]">
@@ -255,6 +263,7 @@ export function ReviewBoard() {
                     habit={review.habit}
                     suggestion={review.planAdjust}
                     busy={busy}
+                    aiEnabled={aiEnabled}
                     onAccept={async (target) => {
                       await withBusy(async () => {
                         await acceptTargetChange(review.habit.id, target);
@@ -268,10 +277,6 @@ export function ReviewBoard() {
                   />
                 </div>
               ) : null}
-
-              <p className="mt-5 font-mono text-[10px] tracking-[0.14em] text-[var(--muted)] uppercase">
-                Coach · coming in AI phases
-              </p>
             </section>
           );
         })}

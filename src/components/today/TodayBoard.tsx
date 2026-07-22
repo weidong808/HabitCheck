@@ -174,11 +174,11 @@ export function TodayBoard() {
     if (!recoveryModal) return;
     const { habit, triggerWeekStart } = recoveryModal;
     await withBusy(async () => {
-      if (choice.kind === "smaller_version") {
+      if (choice.kind === "smaller_version" || choice.kind === "ai_comeback") {
         await startRecovery({
           habitId: habit.id,
           triggerWeekStart,
-          kind: "smaller_version",
+          kind: choice.kind,
           actionText: choice.actionText,
         });
       } else {
@@ -192,6 +192,28 @@ export function TodayBoard() {
       setRecoveryModal(null);
     });
   }
+
+  const recoveryWeekSummary = useMemo(() => {
+    if (!recoveryModal) return undefined;
+    const view = views.find((v) => v.habit.id === recoveryModal.habit.id);
+    if (!view) return undefined;
+    const week =
+      recoveryModal.reason === "missed" ? view.priorWeek : view.week;
+    return {
+      doneCount: week.doneCount,
+      target: week.target,
+      status: week.status,
+      difficultyCounts: week.difficultyCounts,
+      successfulRecoveriesInWeek: countSuccessfulRecoveries(
+        recoveries.filter(
+          (e) =>
+            e.habitId === recoveryModal.habit.id &&
+            e.triggerWeekStart === recoveryModal.triggerWeekStart,
+        ),
+      ),
+      atRiskFired: week.atRiskFired,
+    };
+  }, [recoveryModal, views, recoveries]);
 
   if (!ready) {
     return (
@@ -416,6 +438,7 @@ export function TodayBoard() {
           today={today}
           triggerWeekStart={recoveryModal.triggerWeekStart}
           reason={recoveryModal.reason}
+          weekSummary={recoveryWeekSummary}
           busy={busy}
           onChoose={handleRecoveryChoice}
           onDismiss={() => setRecoveryModal(null)}

@@ -13,6 +13,7 @@ export type CreateHabitInput = {
   motivation: string;
   weeklyTarget: number;
   smallerVersion: string;
+  firstTwoWeeksRamp?: string[];
 };
 
 export async function listHabits(): Promise<Habit[]> {
@@ -35,12 +36,18 @@ export async function createHabit(input: CreateHabitInput): Promise<Habit> {
     );
   }
 
+  const ramp = (input.firstTwoWeeksRamp ?? [])
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .slice(0, 6);
+
   const habit: Habit = {
     id: newId(),
     name: input.name.trim(),
     motivation: input.motivation.trim(),
     weeklyTarget: clampWeeklyTarget(input.weeklyTarget),
     smallerVersion: input.smallerVersion.trim(),
+    ...(ramp.length > 0 ? { firstTwoWeeksRamp: ramp } : {}),
     status: "active",
     pause: null,
     createdAt: new Date().toISOString(),

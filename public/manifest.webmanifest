@@ -1,0 +1,17 @@
+{
+  "name": "HabitCheck",
+  "short_name": "HabitCheck",
+  "description": "Recover after missed days — local-first weekly habit coach.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d1210",
+  "theme_color": "#1f6f5b",
+  "icons": [
+    {
+      "src": "/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

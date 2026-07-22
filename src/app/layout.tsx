@@ -36,6 +36,16 @@ export const metadata: Metadata = {
   applicationName: APP_NAME,
   authors: [{ name: SITE_BRAND_NAME, url: SITE_HOME_URL }],
   robots: { index: true, follow: true },
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: APP_NAME,
+    statusBarStyle: "default",
+  },
+  icons: {
+    icon: [{ url: "/app-icon.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/app-icon.svg", type: "image/svg+xml" }],
+  },
   openGraph: {
     title: `${APP_NAME} — ${APP_TAGLINE}`,
     description: APP_DESCRIPTION,

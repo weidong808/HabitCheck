@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { AiConsentModal } from "@/components/ai/AiConsentModal";
+import { callCoach } from "@/lib/ai/client";
 import type { PlanAdjustSuggestion } from "@/lib/tracking";
 import { planAdjustPairKey } from "@/lib/tracking";
 import type { Habit } from "@/lib/tracking/types";
@@ -9,6 +11,7 @@ type TargetAdjustPromptProps = {
   habit: Habit;
   suggestion: PlanAdjustSuggestion;
   busy?: boolean;
+  aiEnabled?: boolean;
   onAccept: (target: number) => Promise<void>;
   onDismiss: (pairKey: string) => Promise<void>;
 };
@@ -17,12 +20,16 @@ export function TargetAdjustPrompt({
   habit,
   suggestion,
   busy,
+  aiEnabled = true,
   onAccept,
   onDismiss,
 }: TargetAdjustPromptProps) {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(suggestion.proposedTarget);
   const [error, setError] = useState<string | null>(null);
+  const [consent, setConsent] = useState(false);
+  const [coachBusy, setCoachBusy] = useState(false);
+  const [explanation, setExplanation] = useState<string | null>(null);
 
   const title =
     suggestion.kind === "down"
@@ -42,6 +49,30 @@ export function TargetAdjustPrompt({
     }
   }
 
+  async function runExplain() {
+    setCoachBusy(true);
+    setError(null);
+    const result = await callCoach<{ explanation: string }>({
+      feature: "plan_adjuster",
+      consented: true,
+      kind: suggestion.kind,
+      allowedTarget: suggestion.proposedTarget,
+      currentTarget: habit.weeklyTarget,
+      summary: {
+        name: habit.name,
+        weeklyTarget: habit.weeklyTarget,
+        smallerVersion: habit.smallerVersion,
+      },
+    });
+    setCoachBusy(false);
+    setConsent(false);
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
+    setExplanation(result.data.explanation);
+  }
+
   return (
     <div className="rounded-xl border border-[var(--border)] bg-[var(--background)]/70 p-4">
       <p className="font-mono text-[10px] tracking-[0.14em] text-[var(--accent)] uppercase">
@@ -58,6 +89,24 @@ export function TargetAdjustPrompt({
         Weeks {suggestion.weekStarts[0]} → {suggestion.weekStarts[1]} (
         {suggestion.classifications.join(", ")}).
       </p>
+
+      {explanation ? (
+        <p className="mt-3 rounded-lg border border-[var(--border)] p-3 text-sm text-[var(--foreground)]">
+          <span className="font-mono text-[10px] tracking-[0.14em] text-[var(--accent)] uppercase">
+            Coach
+          </span>
+          <span className="mt-1 block">{explanation}</span>
+        </p>
+      ) : aiEnabled ? (
+        <button
+          type="button"
+          disabled={busy || coachBusy}
+          onClick={() => setConsent(true)}
+          className="mt-3 text-sm text-[var(--accent)] underline-offset-2 hover:underline disabled:opacity-50"
+        >
+          {coachBusy ? "Explaining…" : "Ask Coach why this suggestion"}
+        </button>
+      ) : null}
 
       {editing ? (
         <label className="mt-3 block text-sm">
@@ -118,6 +167,16 @@ export function TargetAdjustPrompt({
       </div>
       {error ? (
         <p className="mt-2 text-sm text-red-600 dark:text-red-400">{error}</p>
+      ) : null}
+
+      {consent ? (
+        <AiConsentModal
+          title="Explain this target suggestion?"
+          description="We'll send habit name, current target, and the proposed ±1 target only — not full history."
+          busy={coachBusy}
+          onConfirm={() => void runExplain()}
+          onCancel={() => setConsent(false)}
+        />
       ) : null}
     </div>
   );

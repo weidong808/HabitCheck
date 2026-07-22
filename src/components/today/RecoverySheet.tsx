@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { AiConsentModal } from "@/components/ai/AiConsentModal";
+import { callCoach } from "@/lib/ai/client";
 import {
   addDays,
   eachDayOfWeek,
@@ -23,6 +25,10 @@ export type RecoveryChoice =
   | {
       kind: "restart_next";
       scheduledFor: string;
+    }
+  | {
+      kind: "ai_comeback";
+      actionText: string;
     };
 
 type RecoverySheetProps = {
@@ -31,6 +37,14 @@ type RecoverySheetProps = {
   /** Week that triggered recovery (at-risk current week, or missed prior week). */
   triggerWeekStart: string;
   reason: "at_risk" | "missed";
+  weekSummary?: {
+    doneCount: number;
+    target: number;
+    status: string;
+    difficultyCounts: { easy: number; manageable: number; hard: number };
+    successfulRecoveriesInWeek: number;
+    atRiskFired: boolean;
+  };
   busy?: boolean;
   onChoose: (choice: RecoveryChoice) => Promise<void>;
   onDismiss: () => void;
@@ -41,6 +55,7 @@ export function RecoverySheet({
   today,
   triggerWeekStart,
   reason,
+  weekSummary,
   busy,
   onChoose,
   onDismiss,
@@ -48,6 +63,10 @@ export function RecoverySheet({
   const [actionText, setActionText] = useState(habit.smallerVersion);
   const [scheduleDate, setScheduleDate] = useState(today);
   const [error, setError] = useState<string | null>(null);
+  const [consentAi, setConsentAi] = useState(false);
+  const [coachBusy, setCoachBusy] = useState(false);
+  const [aiOptions, setAiOptions] = useState<string[] | null>(null);
+  const [encouragement, setEncouragement] = useState<string | null>(null);
 
   const weekStart = startOfWeekMonday(today);
   const weekDays = eachDayOfWeek(weekStart);
@@ -84,6 +103,46 @@ export function RecoverySheet({
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not start recovery.");
     }
+  }
+
+  async function runComebackCoach() {
+    setCoachBusy(true);
+    setError(null);
+    const result = await callCoach<{
+      options: string[];
+      encouragement: string;
+    }>({
+      feature: "comeback",
+      consented: true,
+      reason,
+      summary: {
+        name: habit.name,
+        weeklyTarget: habit.weeklyTarget,
+        smallerVersion: habit.smallerVersion,
+        week: {
+          weekStart: triggerWeekStart,
+          doneCount: weekSummary?.doneCount ?? 0,
+          target: weekSummary?.target ?? habit.weeklyTarget,
+          status: weekSummary?.status ?? "in_progress",
+          difficultyCounts: weekSummary?.difficultyCounts ?? {
+            easy: 0,
+            manageable: 0,
+            hard: 0,
+          },
+          successfulRecoveriesInWeek:
+            weekSummary?.successfulRecoveriesInWeek ?? 0,
+          atRiskFired: weekSummary?.atRiskFired ?? reason === "at_risk",
+        },
+      },
+    });
+    setCoachBusy(false);
+    setConsentAi(false);
+    if (!result.ok) {
+      setError(result.error + " — try a smaller version instead.");
+      return;
+    }
+    setAiOptions(result.data.options);
+    setEncouragement(result.data.encouragement);
   }
 
   const sunday = useMemo(
@@ -214,14 +273,43 @@ export function RecoverySheet({
             </button>
           </section>
 
-          <section className="rounded-xl border border-dashed border-[var(--border)] p-4 opacity-80">
+          <section className="rounded-xl border border-[var(--border)] p-4">
             <h3 className="text-sm font-semibold text-[var(--foreground)]">
               Ask AI for a personalized comeback
             </h3>
             <p className="mt-1 text-xs text-[var(--muted)]">
-              Comeback Coach (2–3 options) ships with the AI platform phases.
-              Use a smaller version for now.
+              Coach suggests 2–3 micro-options. Pick one — it counts as recovery,
+              not full completion.
             </p>
+            {encouragement ? (
+              <p className="mt-2 text-sm text-[var(--muted)]">{encouragement}</p>
+            ) : null}
+            {aiOptions ? (
+              <div className="mt-3 flex flex-col gap-2">
+                {aiOptions.map((opt) => (
+                  <button
+                    key={opt}
+                    type="button"
+                    disabled={busy || coachBusy}
+                    onClick={() =>
+                      void onChoose({ kind: "ai_comeback", actionText: opt })
+                    }
+                    className="rounded-lg border border-[var(--border)] px-3 py-2 text-left text-sm text-[var(--foreground)] hover:border-[var(--accent)]"
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <button
+                type="button"
+                disabled={busy || coachBusy}
+                onClick={() => setConsentAi(true)}
+                className="mt-3 inline-flex min-h-10 items-center rounded-lg border border-[var(--border)] px-3 text-sm font-medium disabled:opacity-50"
+              >
+                {coachBusy ? "Coaching…" : "Ask Comeback Coach"}
+              </button>
+            )}
           </section>
         </div>
 
@@ -239,6 +327,16 @@ export function RecoverySheet({
           Not now
         </button>
       </div>
+
+      {consentAi ? (
+        <AiConsentModal
+          title="Use Comeback Coach?"
+          description="We'll send a weekly habit summary only (not full history) to suggest micro-actions."
+          busy={coachBusy}
+          onConfirm={() => void runComebackCoach()}
+          onCancel={() => setConsentAi(false)}
+        />
+      ) : null}
     </div>
   );
 }
