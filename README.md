@@ -8,22 +8,18 @@
 
 ## Status
 
-**P4 review Facts** — closed-week consistency / recoveries / difficulty + deterministic ±1 plan adjuster (accept / edit / dismiss → next Monday).
+**P0–P7 code complete** on `main` — Facts tracking, recovery/pause, weekly review ±1, privacy-gated AI coach (Starter · Comeback · Review cards · Plan Adjuster · smaller-version), Settings export/import, PWA manifest. CI green.
 
-**P3 recovery & pause** — recovery paths, pause modes, auto-resume.
+**Still owner-side for public v1.0:** Vercel deploy + `OPENAI_API_KEY`, DNS for `habitcheck.weidong-shi.com`, hub case study / LinkedIn.
 
-**P2 Today loop** — ≤3 habits, check-ins, week ring, backfill.
-
-**P1 tracking core** — Mon–Sun scoring contract (Vitest).
-
-**P0 scaffold** — Next.js, Privacy, CI.
+Local AI: copy `.env.example` → `.env` (same `OPENAI_API_KEY` pattern as Readiness).
 
 ## Stack
 
 - Next.js 16 · React 19 · TypeScript · Tailwind CSS v4 · `next-themes`
 - IndexedDB via Dexie (browser)
-- Vitest for `src/lib/tracking/`
-- Optional AI coach behind a privacy gate (later phases)
+- Vitest for tracking + AI privacy gate + export/import
+- Optional AI coach: OpenAI behind consent + privacy gate (`/api/ai`)
 
 ## Scripts
 
@@ -44,8 +40,8 @@ npm run build
 | P2 | Today loop ✓ |
 | P3 | Recovery & pause ✓ |
 | P4 | Review Facts + ±1 targets ✓ |
-| P5–P6 | AI platform + coach features |
-| P7 | Polish & ship |
+| P5–P6 | AI platform + coach features ✓ |
+| P7 | Polish & ship (code) ✓ · public domain pending |
 
 ## License
 
