@@ -6,15 +6,15 @@ type HabitEntrySurfaceProps = {
   onStart: () => void;
 };
 
-/** Full-bleed first-run composition — brand, one headline, one promise, one CTA. */
+/** First-run composition — brand, one headline, one promise, one CTA. */
 export function HabitEntrySurface({ onStart }: HabitEntrySurfaceProps) {
   return (
     <section
-      className="hc-entry relative isolate -mx-5 min-h-[calc(100dvh-8.5rem)] overflow-hidden px-5 sm:-mx-6 sm:px-6"
+      className="hc-entry relative isolate -mx-5 overflow-hidden px-5 sm:-mx-6 sm:px-6"
       aria-labelledby="hc-entry-heading"
     >
       <div className="hc-entry-glow" aria-hidden />
-      <div className="relative z-10 flex min-h-[calc(100dvh-8.5rem)] flex-col justify-center py-16 sm:py-20">
+      <div className="relative z-10">
         <p className="hc-rise font-mono text-[11px] tracking-[0.18em] text-[var(--accent)] uppercase">
           {APP_SERIES_LABEL}
         </p>
@@ -37,7 +37,7 @@ export function HabitEntrySurface({ onStart }: HabitEntrySurfaceProps) {
             Start with one habit
           </button>
         </div>
-        <p className="hc-fade mt-10 max-w-sm text-sm leading-relaxed text-[var(--muted)]">
+        <p className="hc-fade mt-6 max-w-sm text-sm leading-relaxed text-[var(--muted)]">
           {APP_TRUST_LINE}
         </p>
       </div>

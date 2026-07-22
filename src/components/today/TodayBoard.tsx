@@ -227,14 +227,14 @@ export function TodayBoard() {
 
   if (isEmpty && !showCreate) {
     return (
-      <main id="main" className="mx-auto max-w-3xl px-5 sm:px-6">
+      <main id="main" className="mx-auto max-w-3xl px-5 py-10 sm:px-6 sm:py-14">
         {loadError ? (
-          <p className="mt-6 text-sm text-red-600 dark:text-red-400" role="alert">
+          <p className="mb-6 text-sm text-red-600 dark:text-red-400" role="alert">
             {loadError}
           </p>
         ) : null}
         <HabitEntrySurface onStart={() => setShowCreate(true)} />
-        <p className="pb-10 text-sm text-[var(--muted)]">{WELLNESS_DISCLAIMER}</p>
+        <p className="mt-6 text-sm text-[var(--muted)]">{WELLNESS_DISCLAIMER}</p>
       </main>
     );
   }
