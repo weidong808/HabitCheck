@@ -1,10 +1,13 @@
 # Deploy notes
 
 **Status:** Live  
-**Production:** https://habitcheck.vercel.app  
-**Custom domain (planned):** https://habitcheck.weidong-shi.com  
+**Production:** https://habitcheck-nine.vercel.app  
+**Team alias:** https://habitcheck-wshi.vercel.app  
+**Custom domain (added in Vercel; DNS pending):** https://habitcheck.weidong-shi.com  
 **GitHub:** https://github.com/weidong808/HabitCheck  
-**Vercel project:** `wshi/habitcheck`
+**Vercel project:** `wshi/habitcheck`  
+
+> `habitcheck.vercel.app` is **not** this project (name taken by another Habit Tracker). Prefer `habitcheck-nine.vercel.app` or the custom domain once DNS is set.
 
 ## Cloudflare DNS (when ready)
 
@@ -52,7 +55,7 @@ GitHub is connected — pushes to `main` can trigger production deploys when ena
 ## Post-deploy AI probe
 
 ```powershell
-Invoke-RestMethod https://habitcheck.vercel.app/api/ai
+Invoke-RestMethod https://habitcheck-nine.vercel.app/api/ai
 # expect: status "ready"
 
 $payload = @{
@@ -64,7 +67,7 @@ $payload = @{
 } | ConvertTo-Json
 
 $res = Invoke-RestMethod `
-  -Uri "https://habitcheck.vercel.app/api/ai" `
+  -Uri "https://habitcheck-nine.vercel.app/api/ai" `
   -Method POST -ContentType "application/json" -Body $payload
 $res.ok   # expect: True
 ```

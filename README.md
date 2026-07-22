@@ -10,10 +10,11 @@
 
 **P0–P7 code complete** on `main` — Facts tracking, recovery/pause, weekly review ±1, privacy-gated AI coach (Starter · Comeback · Review cards · Plan Adjuster · smaller-version), Settings export/import, PWA manifest. CI green.
 
-**Live:** https://habitcheck.vercel.app · Vercel project `wshi/habitcheck`  
-**Still owner-side for public v1.0:** DNS for `habitcheck.weidong-shi.com`, hub case study / LinkedIn.
+**Live:** https://habitcheck-nine.vercel.app · Vercel project `wshi/habitcheck`  
+**Still owner-side for public v1.0:** DNS for `habitcheck.weidong-shi.com` (A → `76.76.21.21`, DNS only), hub case study / LinkedIn.
 
-Local AI: copy `.env.example` → `.env` (same `OPENAI_API_KEY` pattern as Readiness). Deploy notes: [`docs/architecture/deploy.md`](docs/architecture/deploy.md).
+Local AI: copy `.env.example` → `.env` (same `OPENAI_API_KEY` pattern as Readiness). Deploy notes: [`docs/architecture/deploy.md`](docs/architecture/deploy.md).  
+Note: `habitcheck.vercel.app` is a different (unrelated) project — use the `-nine` / `-wshi` aliases or the custom domain.
 
 ## Stack
 
