@@ -8,9 +8,11 @@
 
 ## Status
 
-**P1 tracking core** — pure Mon–Sun week math, at-risk, classifyWeek, recovery helpers, Dexie v2 schema. Vitest is the scoring contract (31 tests).
+**P2 Today loop** — create ≤3 habits, done/skip + difficulty, week ring, 7-day backfill, archive (IndexedDB).
 
-**P0 scaffold** — Next.js App Router, Tailwind v4, Privacy, AI route stubs, CI.
+**P1 tracking core** — pure Mon–Sun week math; Vitest scoring contract.
+
+**P0 scaffold** — Next.js App Router, Tailwind v4, Privacy, AI stubs, CI.
 
 ## Stack
 
@@ -35,7 +37,7 @@ npm run build
 |-------|--------|
 | P0 | Scaffold ✓ |
 | P1 | Tracking core ✓ |
-| P2 | Today loop |
+| P2 | Today loop ✓ |
 | P3 | Recovery & pause |
 | P4 | Review Facts + ±1 targets |
 | P5–P6 | AI platform + coach features |
