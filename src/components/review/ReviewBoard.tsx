@@ -1,0 +1,293 @@
+"use client";
+
+import Link from "next/link";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { TargetAdjustPrompt } from "@/components/review/TargetAdjustPrompt";
+import { APP_NAME, APP_SERIES_LABEL } from "@/lib/brand";
+import { listCheckIns } from "@/lib/storage/checkInsRepo";
+import {
+  acceptTargetChange,
+  applyDuePendingTargets,
+  dismissTargetPrompt,
+  listActiveOrPausedHabits,
+} from "@/lib/storage/habitsRepo";
+import { localToday } from "@/lib/storage/ids";
+import { listRecoveryEvents } from "@/lib/storage/recoveryRepo";
+import {
+  buildHabitReviewFacts,
+  endOfWeekSunday,
+  type HabitReviewFacts,
+} from "@/lib/tracking";
+import type { CheckIn, Habit, RecoveryEvent } from "@/lib/tracking/types";
+
+export function ReviewBoard() {
+  const [ready, setReady] = useState(false);
+  const [today, setToday] = useState("2026-01-01");
+  const [habits, setHabits] = useState<Habit[]>([]);
+  const [checkIns, setCheckIns] = useState<CheckIn[]>([]);
+  const [recoveries, setRecoveries] = useState<RecoveryEvent[]>([]);
+  const [selectedWeekByHabit, setSelectedWeekByHabit] = useState<
+    Record<string, string>
+  >({});
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const refresh = useCallback(async () => {
+    const asOf = localToday();
+    setToday(asOf);
+    await applyDuePendingTargets(asOf);
+    const [nextHabits, nextCheckIns, nextRecoveries] = await Promise.all([
+      listActiveOrPausedHabits(),
+      listCheckIns(),
+      listRecoveryEvents(),
+    ]);
+    setHabits(nextHabits);
+    setCheckIns(nextCheckIns);
+    setRecoveries(nextRecoveries);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        await refresh();
+        if (!cancelled) setReady(true);
+      } catch (err) {
+        if (!cancelled) {
+          setError(
+            err instanceof Error ? err.message : "Could not load review.",
+          );
+          setReady(true);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [refresh]);
+
+  const reviews: HabitReviewFacts[] = useMemo(
+    () =>
+      habits.map((habit) =>
+        buildHabitReviewFacts({
+          habit,
+          checkIns,
+          recoveries,
+          asOf: today,
+        }),
+      ),
+    [habits, checkIns, recoveries, today],
+  );
+
+  async function withBusy(action: () => Promise<void>) {
+    setBusy(true);
+    setError(null);
+    try {
+      await action();
+      await refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Update failed.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (!ready) {
+    return (
+      <main id="main" className="mx-auto max-w-3xl px-5 py-10 sm:px-6">
+        <p className="text-[var(--muted)]">Loading review…</p>
+      </main>
+    );
+  }
+
+  return (
+    <main id="main" className="mx-auto max-w-3xl px-5 py-10 sm:px-6 sm:py-14">
+      <p className="font-mono text-[11px] tracking-[0.16em] text-[var(--muted)] uppercase">
+        {APP_SERIES_LABEL} · Review
+      </p>
+      <h1
+        className="mt-3 text-3xl tracking-tight text-[var(--foreground)] sm:text-4xl"
+        style={{ fontFamily: "var(--font-display)" }}
+      >
+        Weekly review
+      </h1>
+      <p className="mt-3 text-base text-[var(--muted)]">
+        Facts only for now — consistency, recoveries, and difficulty stay
+        separate. Coach insight cards ship with AI phases.
+      </p>
+      <p className="mt-2 font-mono text-[11px] tracking-[0.12em] text-[var(--muted)] uppercase">
+        As of · {today}
+      </p>
+
+      {error ? (
+        <p className="mt-4 text-sm text-red-600 dark:text-red-400" role="alert">
+          {error}
+        </p>
+      ) : null}
+
+      {reviews.length === 0 ? (
+        <p className="mt-10 text-[var(--muted)]">
+          No active habits yet.{" "}
+          <Link href="/" className="text-[var(--accent)] underline-offset-2 hover:underline">
+            Add one on Today
+          </Link>
+          .
+        </p>
+      ) : null}
+
+      <div className="mt-10 space-y-8">
+        {reviews.map((review) => {
+          const closed = review.closedWeeks.filter(
+            (w) => w.week.status === "met" || w.week.status === "missed",
+          );
+          const selected =
+            selectedWeekByHabit[review.habit.id] ??
+            closed[closed.length - 1]?.week.weekStart;
+          const selectedFacts =
+            closed.find((w) => w.week.weekStart === selected) ??
+            closed[closed.length - 1];
+
+          return (
+            <section
+              key={review.habit.id}
+              className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-5"
+            >
+              <p className="font-mono text-[11px] tracking-[0.14em] text-[var(--accent)] uppercase">
+                Facts · {review.habit.name}
+              </p>
+              <h2
+                className="mt-1 text-2xl text-[var(--foreground)]"
+                style={{ fontFamily: "var(--font-display)" }}
+              >
+                {review.habit.name}
+              </h2>
+              <p className="mt-1 text-sm text-[var(--muted)]">
+                Current target {review.habit.weeklyTarget}/week
+                {review.habit.pendingWeeklyTarget != null
+                  ? ` · pending ${review.habit.pendingWeeklyTarget} next Monday`
+                  : ""}
+              </p>
+              <p className="mt-2 text-sm text-[var(--muted)]">
+                Average consistency:{" "}
+                {review.averageConsistency == null
+                  ? "—"
+                  : `${Math.round(review.averageConsistency * 100)}%`}
+              </p>
+
+              {closed.length === 0 ? (
+                <p className="mt-4 text-sm text-[var(--muted)]">
+                  No closed weeks yet. Come back after Sunday.
+                </p>
+              ) : (
+                <>
+                  <label className="mt-4 block text-sm">
+                    <span className="text-[var(--muted)]">Closed week</span>
+                    <select
+                      value={selected}
+                      onChange={(e) =>
+                        setSelectedWeekByHabit((prev) => ({
+                          ...prev,
+                          [review.habit.id]: e.target.value,
+                        }))
+                      }
+                      className="mt-1.5 w-full rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-2.5"
+                    >
+                      {closed.map((w) => (
+                        <option
+                          key={w.week.weekStart}
+                          value={w.week.weekStart}
+                        >
+                          {w.week.weekStart} →{" "}
+                          {endOfWeekSunday(w.week.weekStart)} ({w.week.status})
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  {selectedFacts ? (
+                    <dl className="mt-4 grid gap-3 sm:grid-cols-2">
+                      <div className="rounded-xl border border-[var(--border)] p-3">
+                        <dt className="text-xs text-[var(--muted)]">
+                          Consistency
+                        </dt>
+                        <dd className="mt-1 text-lg font-semibold tabular-nums text-[var(--foreground)]">
+                          {Math.round(selectedFacts.consistency * 100)}%
+                          <span className="ml-2 text-sm font-normal text-[var(--muted)]">
+                            ({selectedFacts.week.doneCount}/
+                            {selectedFacts.week.target})
+                          </span>
+                        </dd>
+                      </div>
+                      <div className="rounded-xl border border-[var(--border)] p-3">
+                        <dt className="text-xs text-[var(--muted)]">
+                          Successful recoveries
+                        </dt>
+                        <dd className="mt-1 text-lg font-semibold tabular-nums text-[var(--foreground)]">
+                          {selectedFacts.recoveriesCompleted}
+                        </dd>
+                      </div>
+                      <div className="rounded-xl border border-[var(--border)] p-3 sm:col-span-2">
+                        <dt className="text-xs text-[var(--muted)]">
+                          Difficulty pattern
+                        </dt>
+                        <dd className="mt-1 text-sm text-[var(--foreground)]">
+                          easy {selectedFacts.week.difficultyCounts.easy} ·
+                          manageable{" "}
+                          {selectedFacts.week.difficultyCounts.manageable} ·
+                          hard {selectedFacts.week.difficultyCounts.hard}
+                          <span className="text-[var(--muted)]">
+                            {" "}
+                            · class {selectedFacts.classification}
+                            {selectedFacts.week.atRiskFired
+                              ? " · at-risk fired"
+                              : ""}
+                          </span>
+                        </dd>
+                      </div>
+                    </dl>
+                  ) : null}
+                </>
+              )}
+
+              {review.planAdjust ? (
+                <div className="mt-5">
+                  <TargetAdjustPrompt
+                    habit={review.habit}
+                    suggestion={review.planAdjust}
+                    busy={busy}
+                    onAccept={async (target) => {
+                      await withBusy(async () => {
+                        await acceptTargetChange(review.habit.id, target);
+                      });
+                    }}
+                    onDismiss={async (pairKey) => {
+                      await withBusy(async () => {
+                        await dismissTargetPrompt(review.habit.id, pairKey);
+                      });
+                    }}
+                  />
+                </div>
+              ) : null}
+
+              <p className="mt-5 font-mono text-[10px] tracking-[0.14em] text-[var(--muted)] uppercase">
+                Coach · coming in AI phases
+              </p>
+            </section>
+          );
+        })}
+      </div>
+
+      <p className="mt-10">
+        <Link
+          href="/"
+          className="text-sm font-medium text-[var(--accent)] underline-offset-2 hover:underline"
+        >
+          ← Back to Today
+        </Link>
+      </p>
+      <p className="mt-2 text-xs text-[var(--muted)]">
+        {APP_NAME} keeps Facts honest — target changes never auto-apply.
+      </p>
+    </main>
+  );
+}

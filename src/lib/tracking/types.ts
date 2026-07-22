@@ -26,6 +26,8 @@ export type Habit = {
   lastResumeOn?: string;
   reminder?: { enabled: boolean; timeLocal: string };
   pendingWeeklyTarget?: number;
+  /** Dismissed plan-adjuster pair key (`weekStart|weekStart`) */
+  targetPromptDismissedKey?: string;
   createdAt: string;
   archivedAt?: string;
 };

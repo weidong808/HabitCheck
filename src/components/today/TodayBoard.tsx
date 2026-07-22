@@ -379,8 +379,15 @@ export function TodayBoard() {
         </p>
         <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">
           Recovery paths are live. AI Comeback Coach, Habit Starter, Weekly
-          Review cards, and Plan Adjuster ship next — opt-in, summaries only.
+          Review cards, and Plan Adjuster explanations ship next — opt-in,
+          summaries only.
         </p>
+        <Link
+          href="/review"
+          className="mt-3 inline-flex text-sm font-medium text-[var(--accent)] underline-offset-2 hover:underline"
+        >
+          Open weekly review Facts →
+        </Link>
       </section>
 
       <p className="mt-8 text-sm leading-relaxed text-[var(--muted)]">

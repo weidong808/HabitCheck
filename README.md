@@ -8,9 +8,11 @@
 
 ## Status
 
-**P3 recovery & pause** — recovery paths, smaller-version (not full completion), pause indefinite/until, auto-resume banner, `partially_paused` weeks.
+**P4 review Facts** — closed-week consistency / recoveries / difficulty + deterministic ±1 plan adjuster (accept / edit / dismiss → next Monday).
 
-**P2 Today loop** — ≤3 habits, done/skip, week ring, 7-day backfill.
+**P3 recovery & pause** — recovery paths, pause modes, auto-resume.
+
+**P2 Today loop** — ≤3 habits, check-ins, week ring, backfill.
 
 **P1 tracking core** — Mon–Sun scoring contract (Vitest).
 
@@ -41,7 +43,7 @@ npm run build
 | P1 | Tracking core ✓ |
 | P2 | Today loop ✓ |
 | P3 | Recovery & pause ✓ |
-| P4 | Review Facts + ±1 targets |
+| P4 | Review Facts + ±1 targets ✓ |
 | P5–P6 | AI platform + coach features |
 | P7 | Polish & ship |
 

@@ -4,6 +4,7 @@ import {
   applyPendingTargetIfDue,
   canCreateHabit,
   clampWeeklyTarget,
+  queueWeeklyTarget,
 } from "@/lib/tracking";
 import type { Habit } from "@/lib/tracking/types";
 
@@ -29,7 +30,9 @@ export async function createHabit(input: CreateHabitInput): Promise<Habit> {
   const db = getDb();
   const existing = await listHabits();
   if (!canCreateHabit(existing)) {
-    throw new Error("You already have 3 active or paused habits. Archive one to add another.");
+    throw new Error(
+      "You already have 3 active or paused habits. Archive one to add another.",
+    );
   }
 
   const habit: Habit = {
@@ -72,4 +75,44 @@ export async function applyDuePendingTargets(asOf: string): Promise<void> {
       await db.habits.put(next);
     }
   }
+}
+
+/** Queue a weekly target change effective next Monday. */
+export async function acceptTargetChange(
+  habitId: string,
+  nextTarget: number,
+): Promise<Habit> {
+  const db = getDb();
+  const habit = await db.habits.get(habitId);
+  if (!habit) throw new Error("Habit not found.");
+  const next = {
+    ...queueWeeklyTarget(habit, nextTarget),
+    targetPromptDismissedKey: undefined,
+  };
+  await db.habits.put(next);
+  return next;
+}
+
+export async function dismissTargetPrompt(
+  habitId: string,
+  pairKey: string,
+): Promise<Habit> {
+  const db = getDb();
+  const habit = await db.habits.get(habitId);
+  if (!habit) throw new Error("Habit not found.");
+  const next: Habit = {
+    ...habit,
+    targetPromptDismissedKey: pairKey,
+  };
+  await db.habits.put(next);
+  return next;
+}
+
+export async function clearPendingTarget(habitId: string): Promise<Habit> {
+  const db = getDb();
+  const habit = await db.habits.get(habitId);
+  if (!habit) throw new Error("Habit not found.");
+  const next: Habit = { ...habit, pendingWeeklyTarget: undefined };
+  await db.habits.put(next);
+  return next;
 }
