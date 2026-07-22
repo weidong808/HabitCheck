@@ -1,5 +1,6 @@
 "use client";
 
+import { SeriesAppsStrip } from "@/components/SeriesAppsStrip";
 import { APP_NAME, APP_SERIES_LABEL, APP_TRUST_LINE } from "@/lib/brand";
 
 type HabitEntrySurfaceProps = {
@@ -40,6 +41,7 @@ export function HabitEntrySurface({ onStart }: HabitEntrySurfaceProps) {
         <p className="hc-fade mt-6 max-w-sm text-sm leading-relaxed text-[var(--muted)]">
           {APP_TRUST_LINE}
         </p>
+        <SeriesAppsStrip className="mt-8" />
       </div>
     </section>
   );
