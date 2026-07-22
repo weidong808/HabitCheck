@@ -21,11 +21,11 @@ export function OpenRecoveryCard({
     event.kind === "smaller_version" || event.kind === "ai_comeback";
 
   return (
-    <div className="mt-4 rounded-xl border border-[var(--accent)]/35 bg-[var(--accent)]/5 p-3">
+    <div className="mt-4 rounded-xl border border-[var(--accent)]/30 bg-[color-mix(in_srgb,var(--accent)_8%,var(--card))] p-3.5">
       <p className="font-mono text-[10px] tracking-[0.14em] text-[var(--accent)] uppercase">
         Open recovery
       </p>
-      <p className="mt-1 text-sm text-[var(--foreground)]">
+      <p className="mt-1 text-sm leading-relaxed text-[var(--foreground)]">
         {isMicro
           ? event.actionText ?? "Smaller version"
           : `Scheduled for ${event.scheduledFor}`}

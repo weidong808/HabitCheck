@@ -88,7 +88,7 @@ export function CoachReviewCards({
   }
 
   return (
-    <section className="mt-8 rounded-2xl border border-[var(--border)] bg-[var(--card)] p-5">
+    <section className="mt-8 rounded-2xl border border-[var(--border)] bg-[var(--card)] p-5 shadow-[0_1px_0_color-mix(in_srgb,var(--foreground)_4%,transparent)]">
       <p className="font-mono text-[10px] tracking-[0.14em] text-[var(--accent)] uppercase">
         Coach · Weekly review
       </p>
@@ -98,7 +98,7 @@ export function CoachReviewCards({
       >
         Insight cards
       </h2>
-      <p className="mt-1 text-sm text-[var(--muted)]">
+      <p className="mt-1 text-sm leading-relaxed text-[var(--muted)]">
         Optional coaching on closed-week summaries — Facts stay local until you
         consent.
       </p>
@@ -108,7 +108,7 @@ export function CoachReviewCards({
           {cards.map((card) => (
             <article
               key={`${card.theme}-${card.title}`}
-              className="rounded-xl border border-[var(--border)] p-4"
+              className="rounded-xl bg-[var(--background)]/80 p-4"
             >
               <p className="font-mono text-[10px] tracking-[0.14em] text-[var(--muted)] uppercase">
                 {card.theme}
@@ -116,11 +116,13 @@ export function CoachReviewCards({
               <h3 className="mt-1 text-sm font-semibold text-[var(--foreground)]">
                 {card.title}
               </h3>
-              <p className="mt-1 text-sm text-[var(--muted)]">{card.body}</p>
+              <p className="mt-1 text-sm leading-relaxed text-[var(--muted)]">
+                {card.body}
+              </p>
             </article>
           ))}
           {nextWeekMove ? (
-            <p className="text-sm text-[var(--foreground)]">
+            <p className="text-sm leading-relaxed text-[var(--foreground)]">
               <span className="font-medium">Next week move: </span>
               {nextWeekMove}
             </p>
@@ -139,7 +141,7 @@ export function CoachReviewCards({
           type="button"
           disabled={busy}
           onClick={() => setConsent(true)}
-          className="mt-4 inline-flex min-h-10 items-center rounded-lg border border-[var(--border)] px-3 text-sm font-medium disabled:opacity-50"
+          className="hc-interactive mt-4 inline-flex min-h-10 items-center rounded-lg border border-[var(--border)] px-3 text-sm font-medium disabled:opacity-50"
         >
           {busy ? "Coaching…" : "Ask for coach cards"}
         </button>

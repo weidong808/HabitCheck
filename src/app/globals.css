@@ -3,14 +3,17 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #f5f6f4;
+  --background: #f3f5f2;
   --foreground: #152018;
   --muted: #5a665e;
-  --border: #dfe4df;
+  --border: #d8dfd8;
   --card: #ffffff;
   --accent: #1f6f5b;
   --accent-foreground: #f3fffa;
-  --header-bg: color-mix(in srgb, var(--background) 88%, transparent);
+  --header-bg: color-mix(in srgb, var(--background) 82%, transparent);
+  --atmosphere-a: color-mix(in srgb, #c5d9cb 55%, transparent);
+  --atmosphere-b: color-mix(in srgb, #e8efe6 70%, transparent);
+  --ring: color-mix(in srgb, var(--accent) 55%, #152018);
   --font-display: var(--font-literata), Georgia, "Times New Roman", serif;
   --font-body: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   color-scheme: light;
@@ -24,7 +27,10 @@
   --card: #141b17;
   --accent: #3d9b82;
   --accent-foreground: #04140f;
-  --header-bg: color-mix(in srgb, var(--background) 88%, transparent);
+  --header-bg: color-mix(in srgb, var(--background) 82%, transparent);
+  --atmosphere-a: color-mix(in srgb, #1a3d32 45%, transparent);
+  --atmosphere-b: color-mix(in srgb, #152018 65%, transparent);
+  --ring: color-mix(in srgb, var(--accent) 70%, #e8eee9);
   color-scheme: dark;
 }
 
@@ -35,10 +41,93 @@
   --font-mono: var(--font-geist-mono);
 }
 
+* {
+  border-color: var(--border);
+}
+
+html,
 body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  position: relative;
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-body);
+  text-rendering: optimizeLegibility;
+}
+
+/* Soft sage wash — warm without cream/terracotta cliché */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse 90% 55% at 12% -8%,
+      var(--atmosphere-a),
+      transparent 58%
+    ),
+    radial-gradient(
+      ellipse 70% 45% at 92% 8%,
+      var(--atmosphere-b),
+      transparent 52%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--background) 70%, #e4ebe4) 0%,
+      var(--background) 42%,
+      var(--background) 100%
+    );
+}
+
+.dark body::before {
+  background:
+    radial-gradient(
+      ellipse 80% 50% at 10% -5%,
+      var(--atmosphere-a),
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse 60% 40% at 95% 5%,
+      var(--atmosphere-b),
+      transparent 50%
+    ),
+    var(--background);
+}
+
+/* Fine grain for paper-adjacent warmth */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.35;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.04'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+.dark body::after {
+  opacity: 0.22;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 28%, transparent);
+  color: var(--foreground);
+}
+
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
 }
 
 .skip-link {
@@ -51,6 +140,8 @@ body {
   color: var(--accent-foreground);
   padding: 0.5rem 0.75rem;
   font-size: 0.875rem;
+  font-weight: 600;
+  transition: top 160ms ease;
 }
 
 .skip-link:focus {
@@ -65,6 +156,9 @@ body {
   justify-content: center;
   border-radius: 0.5rem;
   color: var(--muted);
+  transition:
+    color 160ms ease,
+    background-color 160ms ease;
 }
 
 .theme-toggle:hover:not(:disabled) {
@@ -94,4 +188,79 @@ body {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border-width: 0;
+}
+
+/* Presence / hierarchy motions */
+@keyframes hc-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes hc-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes hc-sheet {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.hc-rise {
+  animation: hc-rise 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.hc-rise-delay {
+  animation: hc-rise 520ms cubic-bezier(0.22, 1, 0.36, 1) 80ms both;
+}
+
+.hc-fade {
+  animation: hc-fade 420ms ease both;
+}
+
+.hc-sheet {
+  animation: hc-sheet 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.hc-interactive {
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.hc-interactive:hover {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.week-ring-progress {
+  transition: stroke-dashoffset 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hc-rise,
+  .hc-rise-delay,
+  .hc-fade,
+  .hc-sheet,
+  .week-ring-progress {
+    animation: none !important;
+    transition: none !important;
+  }
 }

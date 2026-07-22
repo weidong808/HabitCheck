@@ -46,6 +46,7 @@ export function WeekRing({
           strokeLinecap="round"
           strokeDasharray={c}
           strokeDashoffset={offset}
+          className="week-ring-progress"
         />
       </svg>
       <span className="absolute text-xs font-semibold tabular-nums text-[var(--foreground)]">

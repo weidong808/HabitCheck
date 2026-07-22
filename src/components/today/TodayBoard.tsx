@@ -218,26 +218,30 @@ export function TodayBoard() {
   if (!ready) {
     return (
       <main id="main" className="mx-auto max-w-3xl px-5 py-10 sm:px-6 sm:py-14">
-        <p className="text-[var(--muted)]">Loading your local habits…</p>
+        <p className="hc-fade text-[var(--muted)]">Loading your local habits…</p>
       </main>
     );
   }
 
   return (
     <main id="main" className="mx-auto max-w-3xl px-5 py-10 sm:px-6 sm:py-14">
-      <p className="font-mono text-[11px] tracking-[0.16em] text-[var(--muted)] uppercase">
-        {APP_SERIES_LABEL}
-      </p>
-      <h1
-        className="mt-3 text-4xl tracking-tight text-[var(--foreground)] sm:text-5xl"
-        style={{ fontFamily: "var(--font-display)" }}
-      >
-        {APP_NAME}
-      </h1>
-      <p className="mt-3 text-lg text-[var(--muted)]">{APP_TAGLINE}</p>
-      <p className="mt-2 font-mono text-[11px] tracking-[0.12em] text-[var(--muted)] uppercase">
-        Today · {today}
-      </p>
+      <header className="hc-rise">
+        <p className="font-mono text-[11px] tracking-[0.16em] text-[var(--muted)] uppercase">
+          {APP_SERIES_LABEL}
+        </p>
+        <h1
+          className="mt-3 text-4xl leading-[1.1] tracking-tight text-[var(--foreground)] sm:text-5xl"
+          style={{ fontFamily: "var(--font-display)" }}
+        >
+          {APP_NAME}
+        </h1>
+        <p className="mt-3 max-w-xl text-lg leading-relaxed text-[var(--muted)]">
+          {APP_TAGLINE}
+        </p>
+        <p className="mt-3 font-mono text-[11px] tracking-[0.12em] text-[var(--muted)] uppercase">
+          Today · {today}
+        </p>
+      </header>
 
       {loadError ? (
         <p className="mt-4 text-sm text-red-600 dark:text-red-400" role="alert">
@@ -252,7 +256,7 @@ export function TodayBoard() {
         />
       </div>
 
-      <section className="mt-4 space-y-4">
+      <section className="hc-rise-delay mt-8 space-y-4">
         <div className="flex items-end justify-between gap-3">
           <div>
             <p className="font-mono text-[11px] tracking-[0.14em] text-[var(--accent)] uppercase">
@@ -269,7 +273,7 @@ export function TodayBoard() {
             <button
               type="button"
               onClick={() => setShowCreate(true)}
-              className="inline-flex min-h-11 items-center rounded-lg border border-[var(--border)] px-3 text-sm font-medium text-[var(--foreground)]"
+              className="hc-interactive inline-flex min-h-11 items-center rounded-lg border border-[var(--border)] bg-[var(--card)]/70 px-3 text-sm font-medium text-[var(--foreground)]"
             >
               Add habit
             </button>
@@ -287,14 +291,21 @@ export function TodayBoard() {
         ) : null}
 
         {views.length === 0 && !showCreate ? (
-          <div className="rounded-2xl border border-dashed border-[var(--border)] p-6">
-            <p className="text-[var(--foreground)]">
-              No habits yet. Add up to three with a weekly target.
+          <div className="rounded-2xl border border-dashed border-[var(--accent)]/30 bg-[color-mix(in_srgb,var(--accent)_6%,var(--card))] px-6 py-8">
+            <p
+              className="text-xl text-[var(--foreground)]"
+              style={{ fontFamily: "var(--font-display)" }}
+            >
+              Start with one habit
+            </p>
+            <p className="mt-2 max-w-md text-sm leading-relaxed text-[var(--muted)]">
+              Pick a weekly target you can keep. Missed days get a recovery path
+              — no shame, no inflated streaks.
             </p>
             <button
               type="button"
               onClick={() => setShowCreate(true)}
-              className="mt-4 inline-flex min-h-11 items-center rounded-lg bg-[var(--accent)] px-4 text-sm font-medium text-[var(--accent-foreground)]"
+              className="mt-5 inline-flex min-h-11 items-center rounded-lg bg-[var(--accent)] px-4 text-sm font-medium text-[var(--accent-foreground)]"
             >
               Create your first habit
             </button>
@@ -395,29 +406,35 @@ export function TodayBoard() {
         })}
       </section>
 
-      <section className="mt-10 rounded-2xl border border-[var(--border)] bg-[var(--card)] p-5">
+      <section className="mt-12 border-t border-[var(--border)]/80 pt-8">
         <p className="font-mono text-[11px] tracking-[0.14em] text-[var(--accent)] uppercase">
           Coach
         </p>
-        <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">
-          Recovery paths are live. AI Comeback Coach, Habit Starter, Weekly
-          Review cards, and Plan Adjuster explanations ship next — opt-in,
-          summaries only.
+        <h2
+          className="mt-2 text-xl text-[var(--foreground)]"
+          style={{ fontFamily: "var(--font-display)" }}
+        >
+          Optional guidance, honest Facts
+        </h2>
+        <p className="mt-2 max-w-xl text-sm leading-relaxed text-[var(--muted)]">
+          Recovery paths, Comeback Coach, and weekly insight cards stay opt-in.
+          Summaries only leave the device when you consent — numbers never get
+          rewritten.
         </p>
         <Link
           href="/review"
-          className="mt-3 inline-flex text-sm font-medium text-[var(--accent)] underline-offset-2 hover:underline"
+          className="mt-4 inline-flex text-sm font-medium text-[var(--accent)] underline-offset-2 hover:underline"
         >
-          Open weekly review Facts →
+          Open weekly review →
         </Link>
       </section>
 
-      <p className="mt-8 text-sm leading-relaxed text-[var(--muted)]">
+      <p className="mt-10 text-sm leading-relaxed text-[var(--muted)]">
         {APP_TRUST_LINE}
       </p>
       <p className="mt-3 text-sm text-[var(--muted)]">{WELLNESS_DISCLAIMER}</p>
 
-      <div className="mt-8 flex flex-wrap gap-3">
+      <div className="mt-8 flex flex-wrap gap-4">
         <Link
           href="/privacy"
           className="text-sm font-medium text-[var(--accent)] underline-offset-2 hover:underline"

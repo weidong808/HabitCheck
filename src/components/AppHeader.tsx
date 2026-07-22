@@ -16,7 +16,7 @@ export function AppHeader() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--header-bg)] backdrop-blur-md">
+    <header className="sticky top-0 z-40 border-b border-[var(--border)]/80 bg-[var(--header-bg)] backdrop-blur-md">
       <div className="mx-auto flex h-14 max-w-3xl items-center justify-between gap-4 px-5 sm:px-6">
         <Link
           href="/"
@@ -24,14 +24,14 @@ export function AppHeader() {
           aria-label={`${APP_NAME} home`}
         >
           <span
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--card)] text-sm font-semibold text-[var(--accent)] transition-colors group-hover:border-[var(--accent)]/50"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[var(--accent)]/25 bg-[color-mix(in_srgb,var(--accent)_10%,var(--card))] text-sm font-semibold text-[var(--accent)] transition-[border-color,background-color] duration-160 group-hover:border-[var(--accent)]/55"
             aria-hidden
           >
             H
           </span>
           <span className="min-w-0">
             <span
-              className="block truncate text-lg leading-none text-[var(--foreground)] transition-colors group-hover:text-[var(--accent)] sm:text-xl"
+              className="block truncate text-lg leading-none text-[var(--foreground)] transition-colors duration-160 group-hover:text-[var(--accent)] sm:text-xl"
               style={{ fontFamily: "var(--font-display)" }}
             >
               {APP_NAME}
@@ -43,7 +43,7 @@ export function AppHeader() {
         </Link>
 
         <nav
-          className="flex shrink-0 items-center gap-1 text-sm sm:gap-2"
+          className="flex shrink-0 items-center gap-0.5 text-sm sm:gap-1"
           aria-label="Primary"
         >
           {NAV.map((item) => {
@@ -56,8 +56,8 @@ export function AppHeader() {
                 href={item.href}
                 className={
                   active
-                    ? "rounded-md px-2.5 py-1.5 font-medium text-[var(--foreground)]"
-                    : "rounded-md px-2.5 py-1.5 text-[var(--muted)] hover:text-[var(--foreground)]"
+                    ? "rounded-md px-2.5 py-1.5 font-medium text-[var(--foreground)] shadow-[inset_0_-2px_0_0_var(--accent)]"
+                    : "rounded-md px-2.5 py-1.5 text-[var(--muted)] transition-colors duration-160 hover:text-[var(--foreground)]"
                 }
                 aria-current={active ? "page" : undefined}
               >

@@ -152,25 +152,25 @@ export function RecoverySheet({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 sm:items-center"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-[color-mix(in_srgb,#0d1210_42%,transparent)] p-4 backdrop-blur-[2px] sm:items-center"
       role="dialog"
       aria-modal="true"
       aria-labelledby="recovery-title"
     >
-      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-[var(--border)] bg-[var(--card)] p-5 shadow-xl">
+      <div className="hc-sheet max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-[var(--border)] bg-[var(--card)] p-5 shadow-[0_12px_40px_color-mix(in_srgb,#0d1210_18%,transparent)]">
         <p className="font-mono text-[11px] tracking-[0.14em] text-[var(--accent)] uppercase">
           Recovery · {habit.name}
         </p>
         <h2
           id="recovery-title"
-          className="mt-2 text-2xl text-[var(--foreground)]"
+          className="mt-2 text-2xl leading-snug text-[var(--foreground)]"
           style={{ fontFamily: "var(--font-display)" }}
         >
           {title}
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">
-          Choose a way to restart. A smaller action still matters — and does not
-          inflate your weekly completion. Trigger week ending {sunday}
+          Pick one calm restart. A smaller action still counts as recovery — and
+          does not inflate your weekly completion. Trigger week ending {sunday}
           {isAfter(today, sunday) ? " (closed)" : ""}.
         </p>
 

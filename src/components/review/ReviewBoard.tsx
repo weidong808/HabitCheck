@@ -101,29 +101,31 @@ export function ReviewBoard() {
   if (!ready) {
     return (
       <main id="main" className="mx-auto max-w-3xl px-5 py-10 sm:px-6">
-        <p className="text-[var(--muted)]">Loading review…</p>
+        <p className="hc-fade text-[var(--muted)]">Loading review…</p>
       </main>
     );
   }
 
   return (
     <main id="main" className="mx-auto max-w-3xl px-5 py-10 sm:px-6 sm:py-14">
-      <p className="font-mono text-[11px] tracking-[0.16em] text-[var(--muted)] uppercase">
-        {APP_SERIES_LABEL} · Review
-      </p>
-      <h1
-        className="mt-3 text-3xl tracking-tight text-[var(--foreground)] sm:text-4xl"
-        style={{ fontFamily: "var(--font-display)" }}
-      >
-        Weekly review
-      </h1>
-      <p className="mt-3 text-base text-[var(--muted)]">
-        Consistency, recoveries, and difficulty stay separate Facts. Optional
-        Coach cards explain patterns without changing the numbers.
-      </p>
-      <p className="mt-2 font-mono text-[11px] tracking-[0.12em] text-[var(--muted)] uppercase">
-        As of · {today}
-      </p>
+      <header className="hc-rise">
+        <p className="font-mono text-[11px] tracking-[0.16em] text-[var(--muted)] uppercase">
+          {APP_SERIES_LABEL} · Review
+        </p>
+        <h1
+          className="mt-3 text-3xl leading-[1.15] tracking-tight text-[var(--foreground)] sm:text-4xl"
+          style={{ fontFamily: "var(--font-display)" }}
+        >
+          Weekly review
+        </h1>
+        <p className="mt-3 max-w-xl text-base leading-relaxed text-[var(--muted)]">
+          Consistency, recoveries, and difficulty stay separate Facts. Optional
+          Coach cards explain patterns without changing the numbers.
+        </p>
+        <p className="mt-3 font-mono text-[11px] tracking-[0.12em] text-[var(--muted)] uppercase">
+          As of · {today}
+        </p>
+      </header>
 
       {error ? (
         <p className="mt-4 text-sm text-red-600 dark:text-red-400" role="alert">
@@ -131,12 +133,17 @@ export function ReviewBoard() {
         </p>
       ) : null}
 
-      <CoachReviewCards reviews={reviews} aiEnabled={aiEnabled} />
+      <div className="hc-rise-delay">
+        <CoachReviewCards reviews={reviews} aiEnabled={aiEnabled} />
+      </div>
 
       {reviews.length === 0 ? (
         <p className="mt-10 text-[var(--muted)]">
           No active habits yet.{" "}
-          <Link href="/" className="text-[var(--accent)] underline-offset-2 hover:underline">
+          <Link
+            href="/"
+            className="text-[var(--accent)] underline-offset-2 hover:underline"
+          >
             Add one on Today
           </Link>
           .
@@ -158,7 +165,7 @@ export function ReviewBoard() {
           return (
             <section
               key={review.habit.id}
-              className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-5"
+              className="hc-interactive rounded-2xl border border-[var(--border)] bg-[var(--card)] p-5 shadow-[0_1px_0_color-mix(in_srgb,var(--foreground)_4%,transparent)]"
             >
               <p className="font-mono text-[11px] tracking-[0.14em] text-[var(--accent)] uppercase">
                 Facts · {review.habit.name}
@@ -214,7 +221,7 @@ export function ReviewBoard() {
 
                   {selectedFacts ? (
                     <dl className="mt-4 grid gap-3 sm:grid-cols-2">
-                      <div className="rounded-xl border border-[var(--border)] p-3">
+                      <div className="rounded-xl bg-[var(--background)]/80 p-3">
                         <dt className="text-xs text-[var(--muted)]">
                           Consistency
                         </dt>
@@ -226,7 +233,7 @@ export function ReviewBoard() {
                           </span>
                         </dd>
                       </div>
-                      <div className="rounded-xl border border-[var(--border)] p-3">
+                      <div className="rounded-xl bg-[var(--background)]/80 p-3">
                         <dt className="text-xs text-[var(--muted)]">
                           Successful recoveries
                         </dt>
@@ -234,7 +241,7 @@ export function ReviewBoard() {
                           {selectedFacts.recoveriesCompleted}
                         </dd>
                       </div>
-                      <div className="rounded-xl border border-[var(--border)] p-3 sm:col-span-2">
+                      <div className="rounded-xl bg-[var(--background)]/80 p-3 sm:col-span-2">
                         <dt className="text-xs text-[var(--muted)]">
                           Difficulty pattern
                         </dt>

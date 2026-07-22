@@ -95,7 +95,7 @@ export function HabitCard({
   }
 
   return (
-    <article className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-5">
+    <article className="hc-interactive rounded-2xl border border-[var(--border)] bg-[var(--card)] p-5 shadow-[0_1px_0_color-mix(in_srgb,var(--foreground)_4%,transparent)]">
       <div className="flex items-start gap-4">
         <WeekRing
           done={week.doneCount}
@@ -104,13 +104,15 @@ export function HabitCard({
         />
         <div className="min-w-0 flex-1">
           <h2
-            className="text-xl text-[var(--foreground)]"
+            className="text-xl leading-snug text-[var(--foreground)]"
             style={{ fontFamily: "var(--font-display)" }}
           >
             {habit.name}
           </h2>
           {habit.motivation ? (
-            <p className="mt-1 text-sm text-[var(--muted)]">{habit.motivation}</p>
+            <p className="mt-1 text-sm leading-relaxed text-[var(--muted)]">
+              {habit.motivation}
+            </p>
           ) : null}
           <p className="mt-2 font-mono text-[11px] tracking-[0.12em] text-[var(--muted)] uppercase">
             {week.status.replaceAll("_", " ")}
@@ -121,11 +123,11 @@ export function HabitCard({
       </div>
 
       {(showAtRiskCta || showMissedCta) && (
-        <div className="mt-4 rounded-xl border border-[var(--border)] bg-[var(--background)]/70 p-3">
-          <p className="text-sm text-[var(--foreground)]">
+        <div className="mt-4 rounded-xl border border-[var(--accent)]/25 bg-[color-mix(in_srgb,var(--accent)_7%,var(--background))] p-3.5">
+          <p className="text-sm leading-relaxed text-[var(--foreground)]">
             {showMissedCta
-              ? "This week didn’t go as planned. Choose a way to restart."
-              : "This week is at risk. Choose a way to restart."}
+              ? "This week didn’t go as planned. Choose a calm way to restart."
+              : "This week is at risk. Choose a calm way to restart."}
           </p>
           <button
             type="button"
@@ -133,7 +135,7 @@ export function HabitCard({
             onClick={() =>
               onOpenRecovery(showMissedCta ? "missed" : "at_risk")
             }
-            className="mt-2 inline-flex min-h-10 items-center rounded-lg bg-[var(--accent)] px-3 text-sm font-medium text-[var(--accent-foreground)]"
+            className="mt-3 inline-flex min-h-10 items-center rounded-lg bg-[var(--accent)] px-3 text-sm font-medium text-[var(--accent-foreground)]"
           >
             Choose a recovery path
           </button>
@@ -183,8 +185,8 @@ export function HabitCard({
                       }
                       className={
                         difficulty === d
-                          ? "rounded-full border border-[var(--accent)] bg-[var(--accent)]/10 px-3 py-1.5 text-xs font-medium capitalize text-[var(--accent)]"
-                          : "rounded-full border border-[var(--border)] px-3 py-1.5 text-xs font-medium capitalize text-[var(--muted)]"
+                          ? "rounded-md border border-[var(--accent)] bg-[var(--accent)]/10 px-3 py-1.5 text-xs font-medium capitalize text-[var(--accent)]"
+                          : "hc-interactive rounded-md border border-[var(--border)] px-3 py-1.5 text-xs font-medium capitalize text-[var(--muted)]"
                       }
                     >
                       {d}
