@@ -3,21 +3,59 @@
 **Status:** Live  
 **Production:** https://habitcheck-nine.vercel.app  
 **Team alias:** https://habitcheck-wshi.vercel.app  
-**Custom domain (added in Vercel; DNS pending):** https://habitcheck.weidong-shi.com  
+**Custom domain (added in Vercel; Cloudflare DNS not created yet):** https://habitcheck.weidong-shi.com  
 **GitHub:** https://github.com/weidong808/HabitCheck  
 **Vercel project:** `wshi/habitcheck`  
 
 > `habitcheck.vercel.app` is **not** this project (name taken by another Habit Tracker). Prefer `habitcheck-nine.vercel.app` or the custom domain once DNS is set.
 
-## Cloudflare DNS (when ready)
+## Cloudflare DNS (owner action required)
 
-Configure **DNS only** (grey cloud), same pattern as Readiness/SleepCheck:
+Domain is already on the Vercel project. Cloudflare has **no** `habitcheck` record yet (`NXDOMAIN`). Nameservers stay on Cloudflare (`kirk` / `tani`).
+
+Create **DNS only** (grey cloud / proxy off), same pattern as Readiness/SleepCheck:
 
 | Type | Name | Content | Proxy |
 |------|------|---------|-------|
 | A | `habitcheck` | `76.76.21.21` | DNS only |
 
-Then in Vercel: Project → Settings → Domains → add `habitcheck.weidong-shi.com`.
+### Dashboard steps
+
+1. Cloudflare → zone **weidong-shi.com** → **DNS** → **Records** → **Add record**
+2. Type **A**, Name **`habitcheck`**, IPv4 **`76.76.21.21`**, Proxy status **DNS only** (grey cloud)
+3. Save. Do not enable the orange cloud.
+
+### Optional API (if `CLOUDFLARE_API_TOKEN` + zone id available)
+
+```powershell
+# Token needs Zone.DNS Edit on weidong-shi.com. Never commit the token.
+$zoneId = "<zone-id>"
+$headers = @{ Authorization = "Bearer $env:CLOUDFLARE_API_TOKEN" }
+$body = @{
+  type    = "A"
+  name    = "habitcheck"
+  content = "76.76.21.21"
+  ttl     = 1
+  proxied = $false
+} | ConvertTo-Json
+Invoke-RestMethod -Method Post -Uri "https://api.cloudflare.com/client/v4/zones/$zoneId/dns_records" `
+  -Headers $headers -ContentType "application/json" -Body $body
+```
+
+### Verify
+
+```powershell
+nslookup habitcheck.weidong-shi.com
+# expect: 76.76.21.21
+
+Invoke-WebRequest https://habitcheck.weidong-shi.com -UseBasicParsing | Select-Object StatusCode
+Invoke-RestMethod https://habitcheck.weidong-shi.com/api/ai
+# expect: status "ready"
+```
+
+Also confirm Vercel → habitcheck → Domains → `habitcheck.weidong-shi.com` shows **Valid**.
+
+See hub inventory: `weidong-website/docs/cloudflare-dns.md`.
 
 ## Environment variables (Production + Preview)
 
