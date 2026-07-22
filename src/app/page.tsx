@@ -22,7 +22,7 @@ export default function HomePage() {
       <p className="mt-3 text-lg text-[var(--muted)]">{APP_TAGLINE}</p>
       <p className="mt-4 max-w-xl text-base leading-relaxed text-[var(--muted)]">
         Local-first weekly habits with kind recovery and a Facts vs Coach
-        design. Scaffold is live — tracking and AI coach surfaces land next.
+        design. Tracking core is in place — Today check-in loop is next.
       </p>
 
       <div className="mt-10 rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6">

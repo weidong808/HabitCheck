@@ -1,24 +1,13 @@
 import Dexie, { type EntityTable } from "dexie";
+import type {
+  CheckIn,
+  Habit,
+  RecoveryEvent,
+} from "@/lib/tracking/types";
 
-/** IndexedDB schema stub — full fields land in P1/P2 per MVP v5. */
-export type HabitRow = {
-  id: string;
-  name: string;
-  motivation: string;
-  weeklyTarget: number;
-  smallerVersion: string;
-  status: "active" | "paused" | "archived";
-  createdAt: string;
-};
-
-export type CheckInRow = {
-  id: string;
-  habitId: string;
-  date: string;
-  status: "done" | "skipped";
-  countsTowardTarget: boolean;
-  loggedAt: string;
-};
+export type HabitRow = Habit;
+export type CheckInRow = CheckIn;
+export type RecoveryEventRow = RecoveryEvent;
 
 export type SettingsRow = {
   id: "settings";
@@ -28,10 +17,28 @@ export type SettingsRow = {
   onboardingCompleted: boolean;
 };
 
+export type AiInvocationLogRow = {
+  id: string;
+  feature:
+    | "habit_starter"
+    | "weekly_review"
+    | "comeback"
+    | "plan_adjuster"
+    | "smaller_version";
+  promptVersion: string;
+  createdAt: string;
+};
+
+/**
+ * IndexedDB schema aligned to MVP v5.
+ * Version 2 adds recovery events + AI invocation log.
+ */
 export class HabitCheckDB extends Dexie {
   habits!: EntityTable<HabitRow, "id">;
   checkIns!: EntityTable<CheckInRow, "id">;
+  recoveryEvents!: EntityTable<RecoveryEventRow, "id">;
   settings!: EntityTable<SettingsRow, "id">;
+  aiInvocationLogs!: EntityTable<AiInvocationLogRow, "id">;
 
   constructor() {
     super("habitcheck");
@@ -39,6 +46,13 @@ export class HabitCheckDB extends Dexie {
       habits: "id, status, createdAt",
       checkIns: "id, habitId, date, [habitId+date]",
       settings: "id",
+    });
+    this.version(2).stores({
+      habits: "id, status, createdAt",
+      checkIns: "id, habitId, date, [habitId+date]",
+      recoveryEvents: "id, habitId, triggerWeekStart, status, kind",
+      settings: "id",
+      aiInvocationLogs: "id, feature, createdAt",
     });
   }
 }
@@ -53,4 +67,9 @@ export function getDb() {
     dbSingleton = new HabitCheckDB();
   }
   return dbSingleton;
+}
+
+/** Test helper — reset singleton between browser tests if added later. */
+export function resetDbSingletonForTests() {
+  dbSingleton = null;
 }

@@ -8,7 +8,9 @@
 
 ## Status
 
-**P0 scaffold** — Next.js App Router, Tailwind v4, Dexie stub, Privacy page, AI route stubs, Vitest, CI.
+**P1 tracking core** — pure Mon–Sun week math, at-risk, classifyWeek, recovery helpers, Dexie v2 schema. Vitest is the scoring contract (31 tests).
+
+**P0 scaffold** — Next.js App Router, Tailwind v4, Privacy, AI route stubs, CI.
 
 ## Stack
 
@@ -31,8 +33,8 @@ npm run build
 
 | Phase | Focus |
 |-------|--------|
-| P0 | Scaffold (this) |
-| P1 | Tracking core + tests |
+| P0 | Scaffold ✓ |
+| P1 | Tracking core ✓ |
 | P2 | Today loop |
 | P3 | Recovery & pause |
 | P4 | Review Facts + ±1 targets |
