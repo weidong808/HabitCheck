@@ -1,15 +1,26 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { OpenRecoveryCard } from "@/components/today/OpenRecoveryCard";
+import { PauseControls } from "@/components/today/PauseControls";
 import { WeekRing } from "@/components/today/WeekRing";
-import { backfillDateWindow } from "@/lib/tracking";
-import type { CheckIn, Difficulty, Habit, WeekSnapshot } from "@/lib/tracking/types";
-import { hasTargetCountingDone } from "@/lib/tracking";
+import { backfillDateWindow, hasTargetCountingDone } from "@/lib/tracking";
+import type {
+  CheckIn,
+  Difficulty,
+  Habit,
+  PauseState,
+  RecoveryEvent,
+  WeekSnapshot,
+} from "@/lib/tracking/types";
 
 type HabitCardProps = {
   habit: Habit;
   week: WeekSnapshot;
+  priorWeek?: WeekSnapshot;
   checkIns: CheckIn[];
+  openRecoveries: RecoveryEvent[];
+  recoveryCount: number;
   today: string;
   busy?: boolean;
   onDone: (difficulty?: Difficulty) => Promise<void>;
@@ -21,6 +32,11 @@ type HabitCardProps = {
     difficulty?: Difficulty,
   ) => Promise<void>;
   onArchive: () => Promise<void>;
+  onPause: (pause: Exclude<PauseState, null>) => Promise<void>;
+  onResume: () => Promise<void>;
+  onOpenRecovery: (reason: "at_risk" | "missed") => void;
+  onCompleteMicroRecovery: (eventId: string) => Promise<void>;
+  onDismissRecovery: (eventId: string) => Promise<void>;
 };
 
 const DIFFICULTIES: Difficulty[] = ["easy", "manageable", "hard"];
@@ -28,7 +44,10 @@ const DIFFICULTIES: Difficulty[] = ["easy", "manageable", "hard"];
 export function HabitCard({
   habit,
   week,
+  priorWeek,
   checkIns,
+  openRecoveries,
+  recoveryCount,
   today,
   busy,
   onDone,
@@ -36,12 +55,18 @@ export function HabitCard({
   onClearToday,
   onBackfill,
   onArchive,
+  onPause,
+  onResume,
+  onOpenRecovery,
+  onCompleteMicroRecovery,
+  onDismissRecovery,
 }: HabitCardProps) {
   const [difficulty, setDifficulty] = useState<Difficulty | undefined>();
   const [showBackfill, setShowBackfill] = useState(false);
   const [backfillDate, setBackfillDate] = useState(today);
   const [error, setError] = useState<string | null>(null);
 
+  const paused = habit.status === "paused";
   const todayDone = hasTargetCountingDone(checkIns, habit.id, today);
   const todaySkip = checkIns.some(
     (c) =>
@@ -52,6 +77,13 @@ export function HabitCard({
   );
 
   const dates = useMemo(() => backfillDateWindow(today, 7), [today]);
+  const showMissedCta =
+    priorWeek?.status === "missed" &&
+    openRecoveries.every((e) => e.triggerWeekStart !== priorWeek.weekStart);
+  const showAtRiskCta =
+    week.atRiskFired &&
+    !paused &&
+    openRecoveries.every((e) => e.triggerWeekStart !== week.weekStart);
 
   async function run(action: () => Promise<void>) {
     setError(null);
@@ -83,74 +115,120 @@ export function HabitCard({
           <p className="mt-2 font-mono text-[11px] tracking-[0.12em] text-[var(--muted)] uppercase">
             {week.status.replaceAll("_", " ")}
             {week.atRiskFired ? " · at risk" : ""}
+            {recoveryCount > 0 ? ` · ${recoveryCount} recoveries` : ""}
           </p>
         </div>
       </div>
 
-      <div className="mt-5">
-        <p className="text-sm font-medium text-[var(--foreground)]">Today</p>
-        {todayDone ? (
-          <p className="mt-2 text-sm text-[var(--accent)]">
-            Done for today. Nice work.
+      {(showAtRiskCta || showMissedCta) && (
+        <div className="mt-4 rounded-xl border border-[var(--border)] bg-[var(--background)]/70 p-3">
+          <p className="text-sm text-[var(--foreground)]">
+            {showMissedCta
+              ? "This week didn’t go as planned. Choose a way to restart."
+              : "This week is at risk. Choose a way to restart."}
           </p>
-        ) : todaySkip ? (
-          <p className="mt-2 text-sm text-[var(--muted)]">Skipped today.</p>
-        ) : (
-          <div className="mt-3 space-y-3">
-            <fieldset>
-              <legend className="sr-only">Difficulty (optional)</legend>
-              <div className="flex flex-wrap gap-2">
-                {DIFFICULTIES.map((d) => (
-                  <button
-                    key={d}
-                    type="button"
-                    disabled={busy}
-                    onClick={() =>
-                      setDifficulty((prev) => (prev === d ? undefined : d))
-                    }
-                    className={
-                      difficulty === d
-                        ? "rounded-full border border-[var(--accent)] bg-[var(--accent)]/10 px-3 py-1.5 text-xs font-medium capitalize text-[var(--accent)]"
-                        : "rounded-full border border-[var(--border)] px-3 py-1.5 text-xs font-medium capitalize text-[var(--muted)]"
-                    }
-                  >
-                    {d}
-                  </button>
-                ))}
-              </div>
-            </fieldset>
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => run(() => onDone(difficulty))}
-                className="inline-flex min-h-11 items-center rounded-lg bg-[var(--accent)] px-4 text-sm font-medium text-[var(--accent-foreground)] disabled:opacity-50"
-              >
-                Mark done
-              </button>
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => run(() => onSkip())}
-                className="inline-flex min-h-11 items-center rounded-lg border border-[var(--border)] px-4 text-sm font-medium text-[var(--foreground)] disabled:opacity-50"
-              >
-                Skip
-              </button>
-            </div>
-          </div>
-        )}
-
-        {(todayDone || todaySkip) && (
           <button
             type="button"
             disabled={busy}
-            onClick={() => run(() => onClearToday())}
-            className="mt-3 text-sm text-[var(--muted)] underline-offset-2 hover:underline"
+            onClick={() =>
+              onOpenRecovery(showMissedCta ? "missed" : "at_risk")
+            }
+            className="mt-2 inline-flex min-h-10 items-center rounded-lg bg-[var(--accent)] px-3 text-sm font-medium text-[var(--accent-foreground)]"
           >
-            Undo today
+            Choose a recovery path
           </button>
-        )}
-      </div>
+        </div>
+      )}
+
+      {openRecoveries.map((event) => (
+        <OpenRecoveryCard
+          key={event.id}
+          event={event}
+          today={today}
+          busy={busy}
+          onCompleteMicro={() => run(() => onCompleteMicroRecovery(event.id))}
+          onDismiss={() => run(() => onDismissRecovery(event.id))}
+        />
+      ))}
+
+      <PauseControls
+        habit={habit}
+        today={today}
+        busy={busy}
+        onPause={onPause}
+        onResume={onResume}
+      />
+
+      {!paused ? (
+        <div className="mt-5">
+          <p className="text-sm font-medium text-[var(--foreground)]">Today</p>
+          {todayDone ? (
+            <p className="mt-2 text-sm text-[var(--accent)]">
+              Done for today. Nice work.
+            </p>
+          ) : todaySkip ? (
+            <p className="mt-2 text-sm text-[var(--muted)]">Skipped today.</p>
+          ) : (
+            <div className="mt-3 space-y-3">
+              <fieldset>
+                <legend className="sr-only">Difficulty (optional)</legend>
+                <div className="flex flex-wrap gap-2">
+                  {DIFFICULTIES.map((d) => (
+                    <button
+                      key={d}
+                      type="button"
+                      disabled={busy}
+                      onClick={() =>
+                        setDifficulty((prev) => (prev === d ? undefined : d))
+                      }
+                      className={
+                        difficulty === d
+                          ? "rounded-full border border-[var(--accent)] bg-[var(--accent)]/10 px-3 py-1.5 text-xs font-medium capitalize text-[var(--accent)]"
+                          : "rounded-full border border-[var(--border)] px-3 py-1.5 text-xs font-medium capitalize text-[var(--muted)]"
+                      }
+                    >
+                      {d}
+                    </button>
+                  ))}
+                </div>
+              </fieldset>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => run(() => onDone(difficulty))}
+                  className="inline-flex min-h-11 items-center rounded-lg bg-[var(--accent)] px-4 text-sm font-medium text-[var(--accent-foreground)] disabled:opacity-50"
+                >
+                  Mark done
+                </button>
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => run(() => onSkip())}
+                  className="inline-flex min-h-11 items-center rounded-lg border border-[var(--border)] px-4 text-sm font-medium text-[var(--foreground)] disabled:opacity-50"
+                >
+                  Skip
+                </button>
+              </div>
+            </div>
+          )}
+
+          {(todayDone || todaySkip) && (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => run(() => onClearToday())}
+              className="mt-3 text-sm text-[var(--muted)] underline-offset-2 hover:underline"
+            >
+              Undo today
+            </button>
+          )}
+        </div>
+      ) : (
+        <p className="mt-5 text-sm text-[var(--muted)]">
+          Check-ins are paused. Your previous progress remains.
+        </p>
+      )}
 
       <div className="mt-5 border-t border-[var(--border)] pt-4">
         <button
@@ -181,19 +259,19 @@ export function HabitCard({
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
-                disabled={busy}
+                disabled={busy || paused}
                 onClick={() =>
                   run(() => onBackfill(backfillDate, "done", difficulty))
                 }
-                className="inline-flex min-h-10 items-center rounded-lg border border-[var(--border)] px-3 text-sm"
+                className="inline-flex min-h-10 items-center rounded-lg border border-[var(--border)] px-3 text-sm disabled:opacity-50"
               >
                 Done
               </button>
               <button
                 type="button"
-                disabled={busy}
+                disabled={busy || paused}
                 onClick={() => run(() => onBackfill(backfillDate, "skipped"))}
-                className="inline-flex min-h-10 items-center rounded-lg border border-[var(--border)] px-3 text-sm"
+                className="inline-flex min-h-10 items-center rounded-lg border border-[var(--border)] px-3 text-sm disabled:opacity-50"
               >
                 Skip
               </button>

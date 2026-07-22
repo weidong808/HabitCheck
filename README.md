@@ -8,11 +8,13 @@
 
 ## Status
 
-**P2 Today loop** — create ≤3 habits, done/skip + difficulty, week ring, 7-day backfill, archive (IndexedDB).
+**P3 recovery & pause** — recovery paths, smaller-version (not full completion), pause indefinite/until, auto-resume banner, `partially_paused` weeks.
 
-**P1 tracking core** — pure Mon–Sun week math; Vitest scoring contract.
+**P2 Today loop** — ≤3 habits, done/skip, week ring, 7-day backfill.
 
-**P0 scaffold** — Next.js App Router, Tailwind v4, Privacy, AI stubs, CI.
+**P1 tracking core** — Mon–Sun scoring contract (Vitest).
+
+**P0 scaffold** — Next.js, Privacy, CI.
 
 ## Stack
 
@@ -38,7 +40,7 @@ npm run build
 | P0 | Scaffold ✓ |
 | P1 | Tracking core ✓ |
 | P2 | Today loop ✓ |
-| P3 | Recovery & pause |
+| P3 | Recovery & pause ✓ |
 | P4 | Review Facts + ±1 targets |
 | P5–P6 | AI platform + coach features |
 | P7 | Polish & ship |

@@ -20,6 +20,10 @@ export type Habit = {
   icon?: string;
   status: HabitStatus;
   pause: PauseState;
+  /** Local YYYY-MM-DD when the current pause began */
+  pauseStartedOn?: string;
+  /** Local YYYY-MM-DD when the habit last resumed from pause */
+  lastResumeOn?: string;
   reminder?: { enabled: boolean; timeLocal: string };
   pendingWeeklyTarget?: number;
   createdAt: string;

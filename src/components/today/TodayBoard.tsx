@@ -5,6 +5,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { CreateHabitForm } from "@/components/today/CreateHabitForm";
 import { HabitCard } from "@/components/today/HabitCard";
 import {
+  RecoverySheet,
+  type RecoveryChoice,
+} from "@/components/today/RecoverySheet";
+import { ResumeBanner } from "@/components/today/ResumeBanner";
+import {
   APP_NAME,
   APP_SERIES_LABEL,
   APP_TAGLINE,
@@ -24,37 +29,74 @@ import {
   type CreateHabitInput,
 } from "@/lib/storage/habitsRepo";
 import { localToday } from "@/lib/storage/ids";
+import { applyDueAutoResumes, pauseHabit, resumeHabit } from "@/lib/storage/pauseRepo";
 import {
+  completeMicroRecovery,
+  dismissRecovery,
+  listRecoveryEvents,
+  startRecovery,
+  syncRecoveryCompletions,
+} from "@/lib/storage/recoveryRepo";
+import {
+  addDays,
   buildWeekSnapshot,
   canCreateHabit,
+  countSuccessfulRecoveries,
+  deriveWeekPauseMode,
   startOfWeekMonday,
 } from "@/lib/tracking";
-import type { CheckIn, Difficulty, Habit, WeekSnapshot } from "@/lib/tracking/types";
+import type {
+  CheckIn,
+  Difficulty,
+  Habit,
+  PauseState,
+  RecoveryEvent,
+  WeekSnapshot,
+} from "@/lib/tracking/types";
 
 type HabitView = {
   habit: Habit;
   week: WeekSnapshot;
+  priorWeek: WeekSnapshot;
+};
+
+type RecoveryModal = {
+  habit: Habit;
+  reason: "at_risk" | "missed";
+  triggerWeekStart: string;
 };
 
 export function TodayBoard() {
   const [ready, setReady] = useState(false);
   const [habits, setHabits] = useState<Habit[]>([]);
   const [checkIns, setCheckIns] = useState<CheckIn[]>([]);
+  const [recoveries, setRecoveries] = useState<RecoveryEvent[]>([]);
   const [today, setToday] = useState("2026-01-01");
   const [showCreate, setShowCreate] = useState(false);
   const [busy, setBusy] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [resumeNames, setResumeNames] = useState<string[]>([]);
+  const [recoveryModal, setRecoveryModal] = useState<RecoveryModal | null>(
+    null,
+  );
 
   const refresh = useCallback(async () => {
     const asOf = localToday();
     setToday(asOf);
     await applyDuePendingTargets(asOf);
-    const [nextHabits, nextCheckIns] = await Promise.all([
+    const auto = await applyDueAutoResumes(asOf);
+    if (auto.resumed.length > 0) {
+      setResumeNames(auto.resumed.map((h) => h.name));
+    }
+    await syncRecoveryCompletions();
+    const [nextHabits, nextCheckIns, nextRecoveries] = await Promise.all([
       listActiveOrPausedHabits(),
       listCheckIns(),
+      listRecoveryEvents(),
     ]);
     setHabits(nextHabits);
     setCheckIns(nextCheckIns);
+    setRecoveries(nextRecoveries);
   }, []);
 
   useEffect(() => {
@@ -79,17 +121,34 @@ export function TodayBoard() {
 
   const views: HabitView[] = useMemo(() => {
     const weekStart = startOfWeekMonday(today);
-    return habits.map((habit) => ({
-      habit,
-      week: buildWeekSnapshot({
-        habitId: habit.id,
-        weekStart,
-        target: habit.weeklyTarget,
-        checkIns,
+    const priorStart = addDays(weekStart, -7);
+    return habits.map((habit) => {
+      const pauseMode = deriveWeekPauseMode({ habit, weekStart, asOf: today });
+      const priorPause = deriveWeekPauseMode({
+        habit,
+        weekStart: priorStart,
         asOf: today,
-        pauseMode: habit.status === "paused" ? "full" : "none",
-      }),
-    }));
+      });
+      return {
+        habit,
+        week: buildWeekSnapshot({
+          habitId: habit.id,
+          weekStart,
+          target: habit.weeklyTarget,
+          checkIns,
+          asOf: today,
+          pauseMode,
+        }),
+        priorWeek: buildWeekSnapshot({
+          habitId: habit.id,
+          weekStart: priorStart,
+          target: habit.weeklyTarget,
+          checkIns,
+          asOf: today,
+          pauseMode: priorPause,
+        }),
+      };
+    });
   }, [habits, checkIns, today]);
 
   const canAdd = canCreateHabit(habits);
@@ -108,6 +167,29 @@ export function TodayBoard() {
     await withBusy(async () => {
       await createHabit(input);
       setShowCreate(false);
+    });
+  }
+
+  async function handleRecoveryChoice(choice: RecoveryChoice) {
+    if (!recoveryModal) return;
+    const { habit, triggerWeekStart } = recoveryModal;
+    await withBusy(async () => {
+      if (choice.kind === "smaller_version") {
+        await startRecovery({
+          habitId: habit.id,
+          triggerWeekStart,
+          kind: "smaller_version",
+          actionText: choice.actionText,
+        });
+      } else {
+        await startRecovery({
+          habitId: habit.id,
+          triggerWeekStart,
+          kind: choice.kind,
+          scheduledFor: choice.scheduledFor,
+        });
+      }
+      setRecoveryModal(null);
     });
   }
 
@@ -141,7 +223,14 @@ export function TodayBoard() {
         </p>
       ) : null}
 
-      <section className="mt-10 space-y-4">
+      <div className="mt-6">
+        <ResumeBanner
+          names={resumeNames}
+          onDismiss={() => setResumeNames([])}
+        />
+      </div>
+
+      <section className="mt-4 space-y-4">
         <div className="flex items-end justify-between gap-3">
           <div>
             <p className="font-mono text-[11px] tracking-[0.14em] text-[var(--accent)] uppercase">
@@ -190,58 +279,98 @@ export function TodayBoard() {
           </div>
         ) : null}
 
-        {views.map(({ habit, week }) => (
-          <HabitCard
-            key={habit.id}
-            habit={habit}
-            week={week}
-            checkIns={checkIns}
-            today={today}
-            busy={busy}
-            onDone={async (difficulty?: Difficulty) => {
-              await withBusy(async () => {
-                await logCheckIn({
-                  habitId: habit.id,
-                  date: today,
-                  status: "done",
-                  difficulty,
-                  countsTowardTarget: true,
+        {views.map(({ habit, week, priorWeek }) => {
+          const openRecoveries = recoveries.filter(
+            (e) => e.habitId === habit.id && e.status === "selected",
+          );
+          const recoveryCount = countSuccessfulRecoveries(
+            recoveries.filter((e) => e.habitId === habit.id),
+          );
+
+          return (
+            <HabitCard
+              key={habit.id}
+              habit={habit}
+              week={week}
+              priorWeek={priorWeek}
+              checkIns={checkIns}
+              openRecoveries={openRecoveries}
+              recoveryCount={recoveryCount}
+              today={today}
+              busy={busy}
+              onDone={async (difficulty?: Difficulty) => {
+                await withBusy(async () => {
+                  await logCheckIn({
+                    habitId: habit.id,
+                    date: today,
+                    status: "done",
+                    difficulty,
+                    countsTowardTarget: true,
+                  });
                 });
-              });
-            }}
-            onSkip={async () => {
-              await withBusy(async () => {
-                await logCheckIn({
-                  habitId: habit.id,
-                  date: today,
-                  status: "skipped",
-                  countsTowardTarget: true,
+              }}
+              onSkip={async () => {
+                await withBusy(async () => {
+                  await logCheckIn({
+                    habitId: habit.id,
+                    date: today,
+                    status: "skipped",
+                    countsTowardTarget: true,
+                  });
                 });
-              });
-            }}
-            onClearToday={async () => {
-              await withBusy(async () => {
-                await clearTargetCountingForDate(habit.id, today);
-              });
-            }}
-            onBackfill={async (date, status, difficulty) => {
-              await withBusy(async () => {
-                await logCheckIn({
-                  habitId: habit.id,
-                  date,
-                  status,
-                  difficulty,
-                  countsTowardTarget: true,
+              }}
+              onClearToday={async () => {
+                await withBusy(async () => {
+                  await clearTargetCountingForDate(habit.id, today);
                 });
-              });
-            }}
-            onArchive={async () => {
-              await withBusy(async () => {
-                await archiveHabit(habit.id);
-              });
-            }}
-          />
-        ))}
+              }}
+              onBackfill={async (date, status, difficulty) => {
+                await withBusy(async () => {
+                  await logCheckIn({
+                    habitId: habit.id,
+                    date,
+                    status,
+                    difficulty,
+                    countsTowardTarget: true,
+                  });
+                });
+              }}
+              onArchive={async () => {
+                await withBusy(async () => {
+                  await archiveHabit(habit.id);
+                });
+              }}
+              onPause={async (pause: Exclude<PauseState, null>) => {
+                await withBusy(async () => {
+                  await pauseHabit(habit.id, pause, today);
+                });
+              }}
+              onResume={async () => {
+                await withBusy(async () => {
+                  await resumeHabit(habit.id, today);
+                });
+              }}
+              onOpenRecovery={(reason) => {
+                setRecoveryModal({
+                  habit,
+                  reason,
+                  triggerWeekStart:
+                    reason === "missed" ? priorWeek.weekStart : week.weekStart,
+                });
+              }}
+              onCompleteMicroRecovery={async (eventId) => {
+                await withBusy(async () => {
+                  await completeMicroRecovery(eventId, today);
+                });
+              }}
+              onDismissRecovery={async (eventId) => {
+                await withBusy(async () => {
+                  await dismissRecovery(eventId);
+                });
+              }}
+            />
+          );
+        })}
       </section>
 
       <section className="mt-10 rounded-2xl border border-[var(--border)] bg-[var(--card)] p-5">
@@ -249,9 +378,8 @@ export function TodayBoard() {
           Coach
         </p>
         <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">
-          Habit Starter, Comeback Coach, Weekly Review cards, and Plan Adjuster
-          ship next — opt-in, summaries only. Facts above stay honest either
-          way.
+          Recovery paths are live. AI Comeback Coach, Habit Starter, Weekly
+          Review cards, and Plan Adjuster ship next — opt-in, summaries only.
         </p>
       </section>
 
@@ -274,6 +402,18 @@ export function TodayBoard() {
           Weekly review
         </Link>
       </div>
+
+      {recoveryModal ? (
+        <RecoverySheet
+          habit={recoveryModal.habit}
+          today={today}
+          triggerWeekStart={recoveryModal.triggerWeekStart}
+          reason={recoveryModal.reason}
+          busy={busy}
+          onChoose={handleRecoveryChoice}
+          onDismiss={() => setRecoveryModal(null)}
+        />
+      ) : null}
     </main>
   );
 }
