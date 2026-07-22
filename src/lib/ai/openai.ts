@@ -41,7 +41,8 @@ export async function generateJson(args: {
 export function summarizeProviderError(err: unknown): string {
   if (!err || typeof err !== "object") return "provider_error";
   const e = err as { status?: number; code?: string; message?: string };
-  return [e.status && `status_${e.status}`, e.code, e.message?.slice(0, 80)]
+  // Never echo provider messages — they can include partial API keys.
+  return [e.status && `status_${e.status}`, e.code || "provider_error"]
     .filter(Boolean)
-    .join(":") || "provider_error";
+    .join(":");
 }
