@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #f5f6f4;
+  --foreground: #152018;
+  --muted: #5a665e;
+  --border: #dfe4df;
+  --card: #ffffff;
+  --accent: #1f6f5b;
+  --accent-foreground: #f3fffa;
+  --header-bg: color-mix(in srgb, var(--background) 88%, transparent);
+  --font-display: var(--font-literata), Georgia, "Times New Roman", serif;
+  --font-body: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  color-scheme: light;
+}
+
+.dark {
+  --background: #0d1210;
+  --foreground: #e8eee9;
+  --muted: #9aab9f;
+  --border: #243028;
+  --card: #141b17;
+  --accent: #3d9b82;
+  --accent-foreground: #04140f;
+  --header-bg: color-mix(in srgb, var(--background) 88%, transparent);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-body);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body);
+}
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -100%;
+  z-index: 100;
+  border-radius: 0.5rem;
+  background: var(--accent);
+  color: var(--accent-foreground);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.skip-link:focus {
+  top: 1rem;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  height: 2rem;
+  width: 2rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  color: var(--muted);
+}
+
+.theme-toggle:hover:not(:disabled) {
+  color: var(--foreground);
+  background: color-mix(in srgb, var(--border) 55%, transparent);
+}
+
+.theme-toggle:disabled {
+  opacity: 0.5;
+}
+
+.theme-toggle-placeholder {
+  display: block;
+  height: 1rem;
+  width: 1rem;
+  border-radius: 9999px;
+  background: var(--border);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
