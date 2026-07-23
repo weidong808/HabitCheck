@@ -195,6 +195,7 @@ export function TodayBoard() {
         });
       }
       setRecoveryModal(null);
+      notify(`${habit.name} — recovery path started`);
     });
   }
 

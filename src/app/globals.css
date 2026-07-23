@@ -441,6 +441,10 @@ body::after {
   border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
 }
 
+.hc-toast-info {
+  border-color: color-mix(in srgb, var(--muted) 55%, var(--border));
+}
+
 .hc-toast-error {
   border-color: color-mix(in srgb, #e5484d 55%, var(--border));
 }
