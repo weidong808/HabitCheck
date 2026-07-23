@@ -4,6 +4,7 @@ import { Analytics } from "@/components/Analytics";
 import { AppFooter } from "@/components/AppFooter";
 import { AppHeader } from "@/components/AppHeader";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { ToastProvider } from "@/components/ui/Toast";
 import {
   APP_DESCRIPTION,
   APP_NAME,
@@ -83,13 +84,15 @@ export default function RootLayout({
     >
       <body className="flex min-h-full flex-col antialiased">
         <ThemeProvider>
-          <a href="#main" className="skip-link">
-            Skip to content
-          </a>
-          <AppHeader />
-          <div className="flex-1">{children}</div>
-          <AppFooter />
-          <Analytics />
+          <ToastProvider>
+            <a href="#main" className="skip-link">
+              Skip to content
+            </a>
+            <AppHeader />
+            <div className="flex-1">{children}</div>
+            <AppFooter />
+            <Analytics />
+          </ToastProvider>
         </ThemeProvider>
       </body>
     </html>
