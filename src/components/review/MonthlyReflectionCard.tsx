@@ -102,7 +102,8 @@ export function MonthlyReflectionCard({
       </div>
       <p className="mt-2 max-w-lg text-sm leading-relaxed text-[var(--muted)]">
         A calm read on your recent rhythm — best days, difficulty, and trend.
-        Only aggregate counts leave this device, and only when you consent.
+        When you consent, habit names plus aggregate counts leave this device —
+        never individual check-ins or dates.
       </p>
 
       {busy ? (
@@ -177,7 +178,7 @@ export function MonthlyReflectionCard({
       {consent ? (
         <AiConsentModal
           title="Use Monthly Reflection?"
-          description="We'll send aggregate counts only (per-habit totals, best weekday, difficulty mix, trend) — never individual check-ins or dates."
+          description="We'll send habit names plus aggregate counts (per-habit totals, best weekday, difficulty mix, trend) — never individual check-ins or dates."
           busy={busy}
           onConfirm={() => void runCoach()}
           onCancel={() => setConsent(false)}
