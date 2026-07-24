@@ -14,6 +14,8 @@ import { generateJson, getOpenAIConfig, summarizeProviderError } from "@/lib/ai/
 import { checkRateLimit } from "@/lib/ai/rateLimit";
 
 export const runtime = "nodejs";
+// Allow enough time for the LLM call to complete on Vercel (default can be too short).
+export const maxDuration = 30;
 
 function clientIp(req: Request): string {
   const forwarded = req.headers.get("x-forwarded-for");
