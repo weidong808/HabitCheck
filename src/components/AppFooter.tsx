@@ -3,10 +3,14 @@ import { SiteHomeLink } from "@/components/SiteHomeLink";
 import {
   APP_NAME,
   GITHUB_REPO_URL,
+  LINKEDIN_ARTICLE_LABEL,
+  LINKEDIN_ARTICLE_URL,
   READINESS_URL,
   RETIRECHECK_URL,
   ROADMAP_URL,
   SITE_BRAND_NAME,
+  SITE_CASE_STUDY_LABEL,
+  SITE_CASE_STUDY_URL,
   SITE_SERIES_NAME,
   SLEEPCHECK_URL,
   WELLNESS_DISCLAIMER,
@@ -46,6 +50,28 @@ export function AppFooter() {
                     Privacy
                   </Link>
                 </li>
+                <li>
+                  <a
+                    href={SITE_CASE_STUDY_URL}
+                    className="hover:text-[var(--foreground)]"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {SITE_CASE_STUDY_LABEL}
+                  </a>
+                </li>
+                {LINKEDIN_ARTICLE_URL ? (
+                  <li>
+                    <a
+                      href={LINKEDIN_ARTICLE_URL}
+                      className="hover:text-[var(--foreground)]"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {LINKEDIN_ARTICLE_LABEL}
+                    </a>
+                  </li>
+                ) : null}
                 <li>
                   <a
                     href={GITHUB_REPO_URL}

@@ -4,15 +4,16 @@
 
 - Live: https://habitcheck.weidong-shi.com
 - Vercel fallback: https://habitcheck-nine.vercel.app
-- Hub: https://weidong-shi.com
+- Hub case study: https://weidong-shi.com/work/habitcheck
+- LinkedIn (AI in Action #4): https://www.linkedin.com/posts/weidong-shi_ai-in-action-4-i-used-to-lie-to-my-habit-activity-7486417146093137922-klvA
 - Roadmap / MVP: https://github.com/weidong808/ai-in-action-roadmap/blob/main/docs/discovery/habitcheck-02-mvp-specification.md
 
 ## Status
 
-**P0–P7 code complete** on `main` — Facts tracking, recovery/pause, weekly review ±1, privacy-gated AI coach (Starter · Comeback · Review cards · Plan Adjuster · smaller-version), Settings export/import, PWA manifest. CI green.
+**P0–P7 code complete** on `main` — Facts tracking, recovery/pause, weekly review ±1, privacy-gated AI coach (Starter · Comeback · Review cards · Plan Adjuster · Monthly Reflection · smaller-version), Settings export/import, PWA manifest. CI green.
 
 **Live:** https://habitcheck.weidong-shi.com · fallback https://habitcheck-nine.vercel.app · Vercel project `wshi/habitcheck`  
-**Still owner-side for public v1.0:** hub case study / LinkedIn.
+**Public v1.0:** hub case study + LinkedIn #4 feed post live (Pulse / hub insight optional).
 
 First visit with no habits opens a branded entry surface (promise + one CTA into Habit Starter / create). Top nav includes a subtle hub link to weidong-shi.com.
 
