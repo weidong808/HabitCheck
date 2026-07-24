@@ -10,6 +10,7 @@ import {
   type RecoveryChoice,
 } from "@/components/today/RecoverySheet";
 import { ResumeBanner } from "@/components/today/ResumeBanner";
+import { useToast } from "@/components/ui/Toast";
 import {
   APP_NAME,
   APP_SERIES_LABEL,
@@ -68,6 +69,7 @@ type RecoveryModal = {
 };
 
 export function TodayBoard() {
+  const { notify } = useToast();
   const [ready, setReady] = useState(false);
   const [habits, setHabits] = useState<Habit[]>([]);
   const [checkIns, setCheckIns] = useState<CheckIn[]>([]);
@@ -169,6 +171,7 @@ export function TodayBoard() {
     await withBusy(async () => {
       await createHabit(input);
       setShowCreate(false);
+      notify(`${input.name} added — one small step counts`);
     });
   }
 
@@ -192,6 +195,7 @@ export function TodayBoard() {
         });
       }
       setRecoveryModal(null);
+      notify(`${habit.name} — recovery path started`);
     });
   }
 
@@ -334,6 +338,7 @@ export function TodayBoard() {
                     difficulty,
                     countsTowardTarget: true,
                   });
+                  notify(`${habit.name} — logged for today`);
                 });
               }}
               onSkip={async () => {
@@ -344,6 +349,7 @@ export function TodayBoard() {
                     status: "skipped",
                     countsTowardTarget: true,
                   });
+                  notify(`${habit.name} — marked as a rest, no streak lost`);
                 });
               }}
               onClearToday={async () => {
@@ -365,6 +371,7 @@ export function TodayBoard() {
               onArchive={async () => {
                 await withBusy(async () => {
                   await archiveHabit(habit.id);
+                  notify(`${habit.name} archived`, "info");
                 });
               }}
               onPause={async (pause: Exclude<PauseState, null>) => {
@@ -388,6 +395,7 @@ export function TodayBoard() {
               onCompleteMicroRecovery={async (eventId) => {
                 await withBusy(async () => {
                   await completeMicroRecovery(eventId, today);
+                  notify("Recovery logged — that's how you come back");
                 });
               }}
               onDismissRecovery={async (eventId) => {
