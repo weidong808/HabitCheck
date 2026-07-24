@@ -11,6 +11,7 @@ const OUTPUT_SCHEMA: Record<AiFeature, string> = {
   weekly_review: `{"cards":[{"theme":"consistency|recoveries|difficulty","title":"string","body":"string"},{"theme":"...","title":"...","body":"..."},{"theme":"...","title":"...","body":"..."}],"nextWeekMove":"string"}`,
   plan_adjuster: `{"explanation":"string"}`,
   smaller_version: `{"smallerVersion":"string"}`,
+  monthly_reflection: `{"headline":"string","observations":["string","string"],"encouragement":"string"}`,
 };
 
 export function systemPrompt(feature: AiFeature): string {

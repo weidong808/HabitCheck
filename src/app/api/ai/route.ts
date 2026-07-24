@@ -7,6 +7,7 @@ import {
   weeklyReviewResponseSchema,
   planAdjusterResponseSchema,
   smallerVersionResponseSchema,
+  monthlyReflectionResponseSchema,
   type AiFeature,
 } from "@/lib/ai/privacyGate";
 import { generateJson, getOpenAIConfig, summarizeProviderError } from "@/lib/ai/openai";
@@ -32,6 +33,8 @@ function schemaFor(feature: AiFeature) {
       return planAdjusterResponseSchema;
     case "smaller_version":
       return smallerVersionResponseSchema;
+    case "monthly_reflection":
+      return monthlyReflectionResponseSchema;
   }
 }
 

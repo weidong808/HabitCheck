@@ -6,6 +6,7 @@ export const PROMPT_VERSIONS = {
   weekly_review: "v1",
   plan_adjuster: "v1",
   smaller_version: "v1",
+  monthly_reflection: "v1",
 } as const;
 
 export type AiFeature = keyof typeof PROMPT_VERSIONS;
@@ -80,12 +81,40 @@ export const smallerVersionRequestSchema = z.object({
   currentSmallerVersion: z.string().max(200).optional(),
 });
 
+export const monthlyHabitInsightSchema = z.object({
+  name: z.string().max(80),
+  weeklyTarget: z.number().int().min(1).max(7),
+  weeksMetTarget: z.number().int().min(0).max(12),
+  totalDone: z.number().int().min(0).max(200),
+  avgDonePerWeek: z.number().min(0).max(7),
+  bestWeekday: z.string().max(3).nullable(),
+  difficultyCounts: z.object({
+    easy: z.number().int().min(0),
+    manageable: z.number().int().min(0),
+    hard: z.number().int().min(0),
+  }),
+  trend: z.enum(["improving", "steady", "slipping"]),
+});
+
+export const monthlyReflectionRequestSchema = z.object({
+  feature: z.literal("monthly_reflection"),
+  consented: z.literal(true),
+  weeks: z.number().int().min(1).max(12),
+  perHabit: z.array(monthlyHabitInsightSchema).min(1).max(3),
+  overall: z.object({
+    totalDone: z.number().int().min(0).max(600),
+    activeHabits: z.number().int().min(0).max(3),
+    bestWeekday: z.string().max(3).nullable(),
+  }),
+});
+
 export const aiRequestSchema = z.discriminatedUnion("feature", [
   starterRequestSchema,
   comebackRequestSchema,
   weeklyReviewRequestSchema,
   planAdjusterRequestSchema,
   smallerVersionRequestSchema,
+  monthlyReflectionRequestSchema,
 ]);
 
 export type AiRequest = z.infer<typeof aiRequestSchema>;
@@ -122,6 +151,12 @@ export const planAdjusterResponseSchema = z.object({
 
 export const smallerVersionResponseSchema = z.object({
   smallerVersion: z.string().min(1).max(200),
+});
+
+export const monthlyReflectionResponseSchema = z.object({
+  headline: z.string().min(1).max(120),
+  observations: z.array(z.string().min(1).max(240)).min(2).max(4),
+  encouragement: z.string().max(240),
 });
 
 /** Strip any unexpected keys — only whitelist leaves the client. */

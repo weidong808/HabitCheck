@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { CoachReviewCards } from "@/components/review/CoachReviewCards";
+import { MonthlyReflectionCard } from "@/components/review/MonthlyReflectionCard";
 import { TargetAdjustPrompt } from "@/components/review/TargetAdjustPrompt";
 import { APP_NAME, APP_SERIES_LABEL } from "@/lib/brand";
 import { listCheckIns } from "@/lib/storage/checkInsRepo";
@@ -135,6 +136,15 @@ export function ReviewBoard() {
 
       <div className="hc-rise-delay">
         <CoachReviewCards reviews={reviews} aiEnabled={aiEnabled} />
+      </div>
+
+      <div className="hc-rise-delay">
+        <MonthlyReflectionCard
+          habits={habits}
+          checkIns={checkIns}
+          today={today}
+          aiEnabled={aiEnabled}
+        />
       </div>
 
       {reviews.length === 0 ? (
