@@ -54,11 +54,13 @@ export const metadata: Metadata = {
     siteName: APP_NAME,
     type: "website",
     locale: "en_US",
+    // Image provided by src/app/opengraph-image.tsx (1200×630)
   },
   twitter: {
     card: "summary_large_image",
     title: `${APP_NAME} — ${APP_TAGLINE}`,
     description: APP_DESCRIPTION,
+    // Uses the same opengraph-image.tsx asset
   },
 };
 
