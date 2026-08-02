@@ -3,7 +3,11 @@ import Link from "next/link";
 import {
   APP_NAME,
   APP_SERIES_LABEL,
+  APP_TAGLINE,
+  APP_TRUST_LINE,
   APP_URL,
+  SITE_CASE_STUDY_LABEL,
+  SITE_CASE_STUDY_URL,
   SITE_HOME_URL,
   WELLNESS_DISCLAIMER,
 } from "@/lib/brand";
@@ -25,9 +29,22 @@ export default function PrivacyPage() {
       >
         Privacy
       </h1>
-      <p className="mt-4 text-base leading-relaxed text-[var(--muted)]">
+      <p className="mt-3 text-base leading-relaxed text-[var(--foreground)]/90">
+        {APP_TAGLINE}
+      </p>
+      <p className="mt-2 text-base leading-relaxed text-[var(--muted)]">
         What stays on your device, when the AI coach may send summaries, and how
-        analytics work.
+        analytics work. {APP_TRUST_LINE}
+      </p>
+      <p className="mt-3 text-sm">
+        <a
+          href={SITE_CASE_STUDY_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-medium text-[var(--accent)] underline-offset-2 hover:underline"
+        >
+          {SITE_CASE_STUDY_LABEL}
+        </a>
       </p>
 
       <div className="mt-8 space-y-6 text-base leading-relaxed text-[var(--muted)]">

@@ -1,12 +1,18 @@
 export const APP_NAME = "HabitCheck";
 export const APP_SHORT_NAME = "HabitCheck";
-export const APP_TAGLINE = "Recover after missed days";
+/** Short chrome / meta tagline — aligns with hub collage label. */
+export const APP_TAGLINE = "Recover without starting over";
+/** Human problem headline for the first-run marketing surface. */
+export const APP_HUMAN_HEADLINE =
+  "Missed a day? Recover without starting over.";
 export const APP_DESCRIPTION =
   "Local-first weekly habit coach — flexible targets, kind recovery, and optional AI guidance. Facts stay honest; coaching is opt-in. Not medical advice.";
 export const APP_URL = "https://habitcheck.weidong-shi.com";
 export const APP_SERIES_LABEL = "AI in Action · App #4";
 export const APP_TRUST_LINE =
   "Facts stay local. Coach is optional. Progress stays honest.";
+export const APP_PRIMARY_CTA_LABEL = "Start with one habit";
+export const APP_STORY_CTA_LABEL = "Read the story";
 
 export const SITE_HOME_URL = "https://weidong-shi.com";
 export const SITE_HOME_LABEL = "weidong-shi.com";

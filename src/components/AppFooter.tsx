@@ -2,6 +2,7 @@ import Link from "next/link";
 import { SiteHomeLink } from "@/components/SiteHomeLink";
 import {
   APP_NAME,
+  APP_TAGLINE,
   GITHUB_REPO_URL,
   LINKEDIN_ARTICLE_LABEL,
   LINKEDIN_ARTICLE_URL,
@@ -30,6 +31,7 @@ export function AppFooter() {
             >
               {APP_NAME}
             </p>
+            <p className="mt-1.5 text-[var(--foreground)]/85">{APP_TAGLINE}</p>
             <p className="mt-2 leading-relaxed">{WELLNESS_DISCLAIMER}</p>
             <p className="mt-3 font-mono text-[11px] tracking-[0.12em] uppercase">
               {SITE_SERIES_NAME} · App #4 · {SITE_BRAND_NAME}
