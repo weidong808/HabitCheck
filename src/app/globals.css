@@ -92,6 +92,12 @@ body {
   overflow-x: clip;
 }
 
+/* Balanced heading wrap on every page (parity with weidong-shi.com) */
+h1,
+h2 {
+  text-wrap: balance;
+}
+
 /* Soft sage wash — warm without cream/terracotta cliché */
 body::before {
   content: "";
