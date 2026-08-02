@@ -50,7 +50,7 @@ export async function getOrCreateSettings() {
   if (existing) return existing;
   const defaults = {
     id: "settings" as const,
-    theme: "system" as const,
+    theme: "dark" as const,
     remindersEnabled: false,
     aiEnabled: true,
     onboardingCompleted: false,
