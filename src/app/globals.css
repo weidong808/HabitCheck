@@ -594,6 +594,39 @@ body::after {
     0 0 0 4px var(--ring);
 }
 
+/* Form fields — border-strong, 44px taps, focus ring */
+.hc-field {
+  display: block;
+  width: 100%;
+  min-height: 2.75rem;
+  box-sizing: border-box;
+  border-radius: 0.5rem;
+  border: 1.5px solid var(--border-strong);
+  background: var(--card);
+  color: var(--foreground);
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  outline: none;
+  transition:
+    border-color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
+}
+
+textarea.hc-field {
+  min-height: 4.5rem;
+  resize: vertical;
+}
+
+.hc-field:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+.hc-field:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .card,
   .card-interactive:hover {

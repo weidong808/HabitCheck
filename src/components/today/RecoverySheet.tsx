@@ -284,7 +284,20 @@ export function RecoverySheet({
             {encouragement ? (
               <p className="mt-2 text-sm text-[var(--muted)]">{encouragement}</p>
             ) : null}
-            {aiOptions ? (
+            {coachBusy && !aiOptions ? (
+              <div className="mt-3 space-y-2" aria-busy="true" aria-live="polite">
+                <p className="sr-only" role="status">
+                  Comeback Coach is writing options…
+                </p>
+                <div className="hc-coach-skeleton h-10 rounded-xl" aria-hidden />
+                <div className="hc-coach-skeleton h-10 rounded-xl" aria-hidden />
+                <div
+                  className="hc-coach-skeleton h-10 rounded-xl"
+                  style={{ width: "85%" }}
+                  aria-hidden
+                />
+              </div>
+            ) : aiOptions ? (
               <div className="mt-3 flex flex-col gap-2">
                 {aiOptions.map((opt) => (
                   <button
@@ -294,7 +307,7 @@ export function RecoverySheet({
                     onClick={() =>
                       void onChoose({ kind: "ai_comeback", actionText: opt })
                     }
-                    className="rounded-lg border border-[var(--border)] px-3 py-2 text-left text-sm text-[var(--foreground)] hover:border-[var(--accent)]"
+                    className="min-h-11 rounded-lg border border-[var(--border-strong)] px-3 py-2 text-left text-sm text-[var(--foreground)] hover:border-[var(--accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]"
                   >
                     {opt}
                   </button>
@@ -305,9 +318,9 @@ export function RecoverySheet({
                 type="button"
                 disabled={busy || coachBusy}
                 onClick={() => setConsentAi(true)}
-                className="mt-3 inline-flex min-h-10 items-center rounded-lg border border-[var(--border)] px-3 text-sm font-medium disabled:opacity-50"
+                className="mt-3 inline-flex min-h-11 items-center rounded-lg border border-[var(--border-strong)] px-3 text-sm font-medium disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]"
               >
-                {coachBusy ? "Coaching…" : "Ask Comeback Coach"}
+                Ask Comeback Coach
               </button>
             )}
           </section>

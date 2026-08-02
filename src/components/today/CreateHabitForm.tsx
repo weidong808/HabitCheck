@@ -140,23 +140,31 @@ export function CreateHabitForm({
                 value={goalText}
                 onChange={(e) => setGoalText(e.target.value)}
                 rows={2}
-                className="mt-1.5 w-full rounded-lg border border-[var(--border)] bg-[var(--card)] px-3 py-2.5 text-[var(--foreground)]"
+                className="hc-field mt-1.5"
                 placeholder="I want a short morning walk most weekdays"
                 disabled={disabled || saving || coachBusy}
               />
             </label>
-            <button
-              type="button"
-              disabled={
-                disabled || saving || coachBusy || goalText.trim().length < 3
-              }
-              onClick={() => setConsent("starter")}
-              className="mt-3 inline-flex min-h-10 items-center rounded-lg bg-[var(--accent)] px-3 text-sm font-medium text-[var(--accent-foreground)] disabled:opacity-50"
-            >
-              {coachBusy && consent === "starter"
-                ? "Listening…"
-                : "Ask Habit Starter"}
-            </button>
+            {coachBusy && consent === "starter" ? (
+              <div className="mt-3 space-y-2" aria-busy="true" aria-live="polite">
+                <p className="sr-only" role="status">
+                  Habit Starter is drafting a plan…
+                </p>
+                <div className="hc-coach-skeleton h-12 rounded-xl" aria-hidden />
+                <div className="hc-coach-skeleton h-12 rounded-xl" aria-hidden />
+              </div>
+            ) : (
+              <button
+                type="button"
+                disabled={
+                  disabled || saving || coachBusy || goalText.trim().length < 3
+                }
+                onClick={() => setConsent("starter")}
+                className="mt-3 inline-flex min-h-11 items-center rounded-lg bg-[var(--accent)] px-3 text-sm font-medium text-[var(--accent-foreground)] disabled:opacity-50"
+              >
+                Ask Habit Starter
+              </button>
+            )}
           </>
         ) : (
           <p className="mt-2 text-sm text-[var(--muted)]">
@@ -171,7 +179,7 @@ export function CreateHabitForm({
           required
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="mt-1.5 w-full rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-2.5 text-[var(--foreground)] outline-none focus:border-[var(--accent)]"
+          className="hc-field mt-1.5"
           placeholder="Morning walk"
           disabled={disabled || saving}
         />
@@ -188,7 +196,7 @@ export function CreateHabitForm({
           required
           value={weeklyTarget}
           onChange={(e) => setWeeklyTarget(Number(e.target.value))}
-          className="mt-1.5 w-full rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-2.5 text-[var(--foreground)] outline-none focus:border-[var(--accent)]"
+          className="hc-field mt-1.5"
           disabled={disabled || saving}
         />
       </label>
@@ -198,7 +206,7 @@ export function CreateHabitForm({
         <input
           value={motivation}
           onChange={(e) => setMotivation(e.target.value)}
-          className="mt-1.5 w-full rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-2.5 text-[var(--foreground)] outline-none focus:border-[var(--accent)]"
+          className="hc-field mt-1.5"
           placeholder="Feel clearer in the morning"
           disabled={disabled || saving}
         />
@@ -213,18 +221,26 @@ export function CreateHabitForm({
             required
             value={smallerVersion}
             onChange={(e) => setSmallerVersion(e.target.value)}
-            className="w-full rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-2.5 text-[var(--foreground)] outline-none focus:border-[var(--accent)]"
+            className="hc-field"
             placeholder="Put on shoes and step outside"
             disabled={disabled || saving}
           />
-          <button
-            type="button"
-            disabled={disabled || saving || coachBusy || !aiEnabled}
-            onClick={() => setConsent("smaller")}
-            className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-lg border border-[var(--border)] px-3 text-sm disabled:opacity-50"
-          >
-            Suggest
-          </button>
+          {coachBusy && consent === "smaller" ? (
+            <div
+              className="hc-coach-skeleton min-h-11 flex-1 rounded-lg sm:max-w-[7rem]"
+              aria-busy="true"
+              aria-label="Suggesting a smaller version"
+            />
+          ) : (
+            <button
+              type="button"
+              disabled={disabled || saving || coachBusy || !aiEnabled}
+              onClick={() => setConsent("smaller")}
+              className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-lg border border-[var(--border-strong)] px-3 text-sm disabled:opacity-50"
+            >
+              Suggest
+            </button>
+          )}
         </div>
       </label>
 

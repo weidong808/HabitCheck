@@ -91,20 +91,32 @@ export function TargetAdjustPrompt({
       </p>
 
       {explanation ? (
-        <p className="mt-3 rounded-lg border border-[var(--border)] p-3 text-sm text-[var(--foreground)]">
+        <p className="mt-3 rounded-lg border border-[var(--border-strong)] p-3 text-sm text-[var(--foreground)]">
           <span className="font-mono text-[10px] tracking-[0.14em] text-[var(--accent)] uppercase">
             Coach
           </span>
           <span className="mt-1 block">{explanation}</span>
         </p>
+      ) : coachBusy ? (
+        <div className="mt-3 space-y-2" aria-busy="true" aria-live="polite">
+          <p className="sr-only" role="status">
+            Coach is explaining this suggestion…
+          </p>
+          <div className="hc-coach-skeleton h-16 rounded-xl" aria-hidden />
+          <div
+            className="hc-coach-skeleton h-10 rounded-xl"
+            style={{ width: "70%" }}
+            aria-hidden
+          />
+        </div>
       ) : aiEnabled ? (
         <button
           type="button"
-          disabled={busy || coachBusy}
+          disabled={busy}
           onClick={() => setConsent(true)}
-          className="mt-3 text-sm text-[var(--accent)] underline-offset-2 hover:underline disabled:opacity-50"
+          className="mt-3 min-h-11 text-sm text-[var(--accent)] underline-offset-2 hover:underline disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]"
         >
-          {coachBusy ? "Explaining…" : "Ask Coach why this suggestion"}
+          Ask Coach why this suggestion
         </button>
       ) : null}
 
