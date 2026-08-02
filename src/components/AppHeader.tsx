@@ -17,8 +17,8 @@ export function AppHeader() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[var(--border)]/80 bg-[var(--header-bg)] backdrop-blur-md">
-      <div className="mx-auto flex h-14 max-w-3xl items-center justify-between gap-4 px-5 sm:px-6">
+    <header className="sticky top-0 z-40 border-b border-[var(--border)]/80 bg-[var(--header-bg)] pt-[env(safe-area-inset-top,0px)] backdrop-blur-md">
+      <div className="mx-auto flex h-14 max-w-3xl items-center justify-between gap-4 px-[max(1.25rem,env(safe-area-inset-left,0px))] pr-[max(1.25rem,env(safe-area-inset-right,0px))] sm:px-6">
         <Link
           href="/"
           className="group flex min-w-0 items-center gap-2.5"
@@ -57,8 +57,8 @@ export function AppHeader() {
                 href={item.href}
                 className={
                   active
-                    ? "rounded-md px-2.5 py-1.5 font-medium text-[var(--foreground)] shadow-[inset_0_-2px_0_0_var(--accent)]"
-                    : "rounded-md px-2.5 py-1.5 text-[var(--muted)] transition-colors duration-160 hover:text-[var(--foreground)]"
+                    ? "inline-flex min-h-11 items-center rounded-md px-2.5 py-1.5 font-medium text-[var(--foreground)] shadow-[inset_0_-2px_0_0_var(--accent)]"
+                    : "inline-flex min-h-11 items-center rounded-md px-2.5 py-1.5 text-[var(--muted)] transition-colors duration-160 hover:text-[var(--foreground)] active:text-[var(--foreground)]"
                 }
                 aria-current={active ? "page" : undefined}
               >

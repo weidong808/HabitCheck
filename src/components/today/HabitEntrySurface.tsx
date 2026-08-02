@@ -21,7 +21,7 @@ export function HabitEntrySurface({ onStart }: HabitEntrySurfaceProps) {
         </p>
         <h1
           id="hc-entry-heading"
-          className="hc-rise-delay mt-5 max-w-[11ch] text-5xl leading-[1.05] tracking-tight text-[var(--foreground)] sm:text-6xl"
+          className="hc-rise-delay mt-5 max-w-[11ch] text-[2.5rem] leading-[1.05] tracking-tight text-balance text-[var(--foreground)] sm:text-6xl"
           style={{ fontFamily: "var(--font-display)" }}
         >
           {APP_NAME}

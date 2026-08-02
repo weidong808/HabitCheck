@@ -141,7 +141,7 @@ export function AppFooter() {
           </div>
         </div>
 
-        <p className="mt-8 border-t border-[var(--border)] py-6 text-xs">
+        <p className="mt-8 border-t border-[var(--border)] pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom,0px))] text-xs">
           © {year} {SITE_BRAND_NAME}. Personal lab / educational showcase.
         </p>
       </div>

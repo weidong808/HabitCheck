@@ -250,7 +250,7 @@ export function TodayBoard() {
           {APP_SERIES_LABEL}
         </p>
         <h1
-          className="mt-3 text-4xl leading-[1.1] tracking-tight text-[var(--foreground)] sm:text-5xl"
+          className="mt-3 text-4xl leading-[1.1] tracking-tight text-balance text-[var(--foreground)] sm:text-5xl"
           style={{ fontFamily: "var(--font-display)" }}
         >
           {APP_NAME}
