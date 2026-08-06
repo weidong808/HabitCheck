@@ -51,4 +51,4 @@ npm run build
 
 ## License
 
-MIT educational showcase — personal lab, not a commercial product.
+MIT educational showcase — personal lab, not a commercial product. See [LICENSE](LICENSE).
